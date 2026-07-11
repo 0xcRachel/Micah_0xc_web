@@ -3,7 +3,7 @@
  */
 export const config = {
   /** Primary download URL for the Micah .exe. Set to GitHub Releases when published. */
-  DOWNLOAD_URL: '/MicahSetup.exe',
+  DOWNLOAD_URL: 'https://drive.google.com/file/d/1xi-HYraCxgz6FuPT9UgmYeErdVxSHgmP/view?usp=sharing',
 
   /** Discord invite URL for the "Join Discord" CTA. */
   DISCORD_URL: '#',
