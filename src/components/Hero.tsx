@@ -218,7 +218,7 @@ export default function Hero() {
           >
             <DownloadIcon />
             {t.hero.ctaPrimary}
-            {config.DOWNLOAD_COMING_SOON && config.DOWNLOAD_URL === '#' && (
+            {config.DOWNLOAD_COMING_SOON && (
               <span className="ml-1 text-[11px] font-normal opacity-80 bg-ink-deep/30 px-2 py-0.5 rounded">
                 {t.nav.comingSoon}
               </span>

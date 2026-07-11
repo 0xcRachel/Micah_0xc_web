@@ -201,7 +201,7 @@ export default function Navbar() {
           >
             <DownloadIcon />
             {t.nav.download}
-            {config.DOWNLOAD_COMING_SOON && config.DOWNLOAD_URL === '#' && (
+            {config.DOWNLOAD_COMING_SOON && (
               <span className="hidden md:block absolute -bottom-9 right-0 whitespace-nowrap bg-ink text-ivory text-[11px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 {t.nav.comingSoon}
               </span>

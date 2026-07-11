@@ -68,7 +68,7 @@ export default function Download() {
     { scope: root, dependencies: [] },
   )
 
-  const comingSoon = config.DOWNLOAD_COMING_SOON && config.DOWNLOAD_URL === '#'
+  const comingSoon = config.DOWNLOAD_COMING_SOON
 
   return (
     <section ref={root} id="download" className="section-y">

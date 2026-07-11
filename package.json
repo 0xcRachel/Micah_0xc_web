@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "build": "npx tsc -b && vite build",
+    "preview": "vite preview",
+    "postinstall": "chmod +x node_modules/.bin/tsc node_modules/.bin/vite 2>/dev/null || true"
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
