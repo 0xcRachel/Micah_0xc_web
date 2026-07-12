@@ -86,6 +86,20 @@ export default function Navbar() {
           },
         })
       }
+
+      // ═══ Navbar shadow on scroll ═══
+      if (navRef.current) {
+        gsap.to(navRef.current, {
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: document.documentElement,
+            start: '50px top',
+            end: '100px top',
+            scrub: 0.3,
+          },
+        })
+      }
     },
     { scope: navRef, dependencies: [] },
   )

@@ -9,74 +9,70 @@ export default function HowItWorks() {
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) return
+      if (prefersReducedMotion() || !root.current) return
+
       const ctx = gsap.context(() => {
+        // Set initial hidden state FIRST
+        gsap.set('[data-step-line]', { scaleY: 0 })
         const steps = gsap.utils.toArray<HTMLElement>('[data-step]')
-
-        // Progress line draw with glow
-        gsap.fromTo('[data-step-line]',
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            duration: 2.5,
-            ease: 'power2.inOut',
-            transformOrigin: 'top center',
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: '[data-steps]',
-              start: 'top 70%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-
-        // Steps stagger with 3D perspective + blur
-        gsap.fromTo(steps,
-          { x: -60, opacity: 0, rotateY: -12, scale: 0.94, filter: 'blur(6px)' },
-          {
-            x: 0,
-            opacity: 1,
-            rotateY: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 1.1,
-            stagger: 0.25,
-            ease: 'power4.out',
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: '[data-steps]',
-              start: 'top 70%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-
-        // Step numbers bounce in with rotation
+        gsap.set(steps, { x: -60, opacity: 0, rotateY: -12, scale: 0.94, filter: 'blur(6px)' })
         const stepNums = gsap.utils.toArray<HTMLElement>('[data-step-num]')
+        gsap.set(stepNums, { scale: 0, rotation: -20, filter: 'blur(4px)' })
+
+        // ═══ Progress line draw — scrub ═══
+        gsap.to('[data-step-line]', {
+          scaleY: 1, duration: 1, ease: 'none',
+          transformOrigin: 'top center',
+          scrollTrigger: {
+            trigger: '[data-steps]',
+            start: 'top 90%',
+            end: 'bottom 60%',
+            scrub: 1,
+          },
+        })
+
+        // ═══ Progress line glow pulse — continuous ═══
+        const lineGlow = document.querySelector('[data-step-line-glow]')
+        if (lineGlow) {
+          gsap.to(lineGlow, {
+            opacity: 0.8,
+            duration: 1.5,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: -1,
+          })
+        }
+
+        // ═══ Steps stagger — scrub ═══
+        gsap.to(steps, {
+          x: 0, opacity: 1, rotateY: 0, scale: 1, filter: 'blur(0px)',
+          duration: 1, stagger: 0.15, ease: 'none',
+          scrollTrigger: {
+            trigger: '[data-steps]',
+            start: 'top 90%',
+            end: 'top 40%',
+            scrub: 0.8,
+          },
+        })
+
+        // ═══ Step numbers — scrub ═══
         stepNums.forEach((num, i) => {
-          gsap.fromTo(num,
-            { scale: 0, rotation: -20, filter: 'blur(4px)' },
-            {
-              scale: 1,
-              rotation: 0,
-              filter: 'blur(0px)',
-              duration: 0.8,
-              delay: 0.4 + i * 0.25,
-              ease: 'elastic.out(1, 0.4)',
-              immediateRender: false,
+          gsap.to(num, {
+            scale: 1, rotation: 0, filter: 'blur(0px)',
+              duration: 1, ease: 'none',
               scrollTrigger: {
                 trigger: '[data-steps]',
-                start: 'top 70%',
-                toggleActions: 'play none none none',
+                start: 'top 90%',
+                end: 'top 40%',
+                scrub: 0.8,
               },
             },
           )
         })
 
-        // Step numbers parallax on scroll — varying depths
+        // ═══ Parallax — scrub ═══
         gsap.to('[data-step-num]', {
-          yPercent: -30,
-          ease: 'none',
+          yPercent: -30, ease: 'none',
           scrollTrigger: {
             trigger: '[data-steps]',
             start: 'top bottom',
@@ -85,10 +81,8 @@ export default function HowItWorks() {
           },
         })
 
-        // Step content parallax — slightly different speed for depth
         gsap.to('[data-step-content]', {
-          yPercent: -15,
-          ease: 'none',
+          yPercent: -15, ease: 'none',
           scrollTrigger: {
             trigger: '[data-steps]',
             start: 'top bottom',
@@ -97,6 +91,7 @@ export default function HowItWorks() {
           },
         })
       }, root)
+
       return () => ctx.revert()
     },
     { scope: root, dependencies: [] },
@@ -113,27 +108,16 @@ export default function HowItWorks() {
         />
 
         <ol data-steps className="mt-16 relative grid gap-8 md:gap-10" style={{ perspective: '1200px' }}>
-          {/* Vertical progress line with glow */}
-          <span
-            data-step-line
-            className="hidden md:block absolute left-[27px] top-2 bottom-2 w-px origin-top"
-            aria-hidden
-          >
+          <span data-step-line className="hidden md:block absolute left-[27px] top-2 bottom-2 w-px origin-top" aria-hidden>
             <span className="absolute inset-0 bg-gradient-to-b from-terracotta/60 via-terracotta/20 to-border-warm" />
             <span className="absolute inset-0 bg-gradient-to-b from-terracotta/30 via-transparent to-transparent blur-[3px]" />
+            <span data-step-line-glow className="absolute inset-0 bg-gradient-to-b from-terracotta/40 via-terracotta/10 to-transparent blur-[6px] opacity-0" />
           </span>
 
           {t.howItWorks.steps.map((step) => (
-            <li
-              key={step.step}
-              data-step
-              className="relative flex gap-5 md:gap-6 pl-0 group"
-            >
+            <li key={step.step} data-step className="relative flex gap-5 md:gap-6 pl-0 group">
               <div className="shrink-0">
-                <span
-                  data-step-num
-                  className="flex items-center justify-center w-14 h-14 rounded-generous bg-sand text-terracotta font-serif text-[1.1rem] z-10 relative shadow-ring-warm hover:bg-terracotta hover:text-ivory hover:shadow-[0_0_25px_rgba(201,100,66,0.3)] transition-all duration-500 cursor-default group-hover:scale-110"
-                >
+                <span data-step-num className="flex items-center justify-center w-14 h-14 rounded-generous bg-sand text-terracotta font-serif text-[1.1rem] z-10 relative shadow-ring-warm hover:bg-terracotta hover:text-ivory hover:shadow-[0_0_25px_rgba(201,100,66,0.3)] transition-all duration-500 cursor-default group-hover:scale-110">
                   {step.step}
                 </span>
               </div>

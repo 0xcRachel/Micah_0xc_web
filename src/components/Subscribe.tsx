@@ -5,7 +5,6 @@ import TextReveal from './TextReveal'
 import MagneticButton from './MagneticButton'
 
 type Status = 'idle' | 'success' | 'error'
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function Subscribe() {
@@ -18,27 +17,24 @@ export default function Subscribe() {
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) return
+      if (prefersReducedMotion() || !root.current) return
+
       const ctx = gsap.context(() => {
-        gsap.fromTo('[data-sub-anim]',
-          { y: 50, opacity: 0, scale: 0.94, filter: 'blur(6px)' },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 1.0,
-            stagger: 0.18,
-            ease: 'power4.out',
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: root.current,
-              start: 'top 80%',
-              toggleActions: 'play none none none',
-            },
+        // Set initial hidden state FIRST
+        gsap.set('[data-sub-anim]', { y: 50, opacity: 0, scale: 0.94, filter: 'blur(6px)' })
+
+        gsap.to('[data-sub-anim]', {
+          y: 0, opacity: 1, scale: 1, filter: 'blur(0px)',
+          duration: 1, stagger: 0.12, ease: 'none',
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'top 95%',
+            end: 'top 60%',
+            scrub: 0.8,
           },
-        )
+        })
       }, root)
+
       return () => ctx.revert()
     },
     { scope: root, dependencies: [] },
@@ -48,12 +44,8 @@ export default function Subscribe() {
     e.preventDefault()
     if (!EMAIL_RE.test(email)) {
       setStatus('error')
-      // Shake animation on error
       if (!prefersReducedMotion() && formRef.current) {
-        gsap.fromTo(formRef.current,
-          { x: -8 },
-          { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' },
-        )
+        gsap.fromTo(formRef.current, { x: -8 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' })
       }
       return
     }
@@ -63,7 +55,6 @@ export default function Subscribe() {
         { opacity: 0, y: 15, scale: 0.9 },
         { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'elastic.out(1, 0.5)' },
       )
-      // Animate checkmark SVG
       const check = successRef.current.querySelector('.check-path')
       if (check) {
         gsap.fromTo(check,
@@ -73,8 +64,6 @@ export default function Subscribe() {
       }
     }
     setEmail('')
-
-    // Reset status after 4s
     setTimeout(() => setStatus('idle'), 4000)
   }
 
@@ -82,7 +71,6 @@ export default function Subscribe() {
     <section ref={root} id="subscribe" className="section-y relative">
       <div className="container-content">
         <div className="max-w-xl mx-auto text-center">
-          {/* Email form */}
           <div data-sub-anim>
             <TextReveal
               text={t.subscribe.title}
@@ -94,20 +82,12 @@ export default function Subscribe() {
               {t.subscribe.subtitle}
             </p>
 
-            <form
-              ref={formRef}
-              onSubmit={handleSubmit}
-              className="mt-10 flex flex-col sm:flex-row gap-3 justify-center"
-              noValidate
-            >
+            <form ref={formRef} onSubmit={handleSubmit} className="mt-10 flex flex-col sm:flex-row gap-3 justify-center" noValidate>
               <div className="relative w-full sm:w-[280px]">
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-                    if (status !== 'idle') setStatus('idle')
-                  }}
+                  onChange={(e) => { setEmail(e.target.value); if (status !== 'idle') setStatus('idle') }}
                   placeholder={t.subscribe.placeholder}
                   aria-label="Email"
                   className={`w-full rounded-[9999px] bg-white/70 backdrop-blur-sm border px-5 py-3.5 text-[0.95rem] text-ink placeholder:text-stone/60 focus:outline-none transition-all duration-500 shadow-sm ${
@@ -133,10 +113,7 @@ export default function Subscribe() {
               </p>
             )}
             {status === 'success' && (
-              <div
-                ref={successRef}
-                className="mt-4 flex items-center gap-3 bg-terracotta/5 rounded-[9999px] px-5 py-3 mx-auto max-w-xs"
-              >
+              <div ref={successRef} className="mt-4 flex items-center gap-3 bg-terracotta/5 rounded-[9999px] px-5 py-3 mx-auto max-w-xs">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 text-terracotta shrink-0">
                   <path className="check-path" d="M20 6 9 17l-5-5" style={{ strokeDasharray: 24, strokeDashoffset: 0 }} />
                 </svg>

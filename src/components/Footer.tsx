@@ -11,43 +11,34 @@ export default function Footer() {
   useGSAP(
     () => {
       if (prefersReducedMotion() || !root.current) return
-      const ctx = gsap.context(() => {
-        // Column stagger with blur
-        gsap.fromTo('[data-footer-col]',
-          { y: 40, opacity: 0, filter: 'blur(4px)' },
-          {
-            y: 0,
-            opacity: 1,
-            filter: 'blur(0px)',
-            duration: 0.8,
-            stagger: 0.12,
-            ease: 'power4.out',
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: root.current,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
 
-        // Bottom bar reveal
-        gsap.fromTo('[data-footer-bottom]',
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            ease: 'power3.out',
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: '[data-footer-bottom]',
-              start: 'top 95%',
-              toggleActions: 'play none none none',
-            },
+      const ctx = gsap.context(() => {
+        // Set initial hidden state FIRST
+        gsap.set('[data-footer-col]', { y: 40, opacity: 0, filter: 'blur(4px)' })
+        gsap.set('[data-footer-bottom]', { y: 20, opacity: 0 })
+
+        gsap.to('[data-footer-col]', {
+          y: 0, opacity: 1, filter: 'blur(0px)',
+          duration: 1, stagger: 0.08, ease: 'none',
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'top 95%',
+            end: 'top 70%',
+            scrub: 0.8,
           },
-        )
+        })
+
+        gsap.to('[data-footer-bottom]', {
+          y: 0, opacity: 1, duration: 1, ease: 'none',
+          scrollTrigger: {
+            trigger: '[data-footer-bottom]',
+            start: 'top 98%',
+            end: 'top 85%',
+            scrub: 0.8,
+          },
+        })
       }, root)
+
       return () => ctx.revert()
     },
     { scope: root, dependencies: [] },
@@ -63,12 +54,10 @@ export default function Footer() {
 
   return (
     <footer ref={root} className="bg-ink text-ivory border-t border-ink-deep relative overflow-hidden">
-      {/* Subtle glow */}
       <div className="pointer-events-none absolute -top-32 left-1/4 h-64 w-64 rounded-full opacity-10 blur-[80px]" style={{ background: 'radial-gradient(circle, #c96442 0%, transparent 70%)' }} />
 
       <div className="container-content py-20 relative">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-          {/* Brand + tagline */}
           <div data-footer-col className="col-span-2 md:col-span-1">
             <a
               href="#top"
@@ -94,14 +83,8 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="relative w-9 h-9 rounded-cozy bg-ink-deep flex items-center justify-center text-silver hover:text-terracotta transition-all duration-300 overflow-hidden group hover:shadow-[0_0_15px_rgba(201,100,66,0.2)]"
-                  onMouseEnter={(e) => {
-                    if (prefersReducedMotion()) return
-                    gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3, ease: 'back.out(1.5)' })
-                  }}
-                  onMouseLeave={(e) => {
-                    if (prefersReducedMotion()) return
-                    gsap.to(e.currentTarget, { scale: 1, duration: 0.4, ease: 'power2.out' })
-                  }}
+                  onMouseEnter={(e) => { if (!prefersReducedMotion()) gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3, ease: 'back.out(1.5)' }) }}
+                  onMouseLeave={(e) => { if (!prefersReducedMotion()) gsap.to(e.currentTarget, { scale: 1, duration: 0.4, ease: 'power2.out' }) }}
                 >
                   <div className="absolute inset-0 bg-terracotta/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-cozy" />
                   <Icon width={16} height={16} className="relative z-10" />
@@ -110,7 +93,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Product */}
           <div data-footer-col>
             <h4 className="overline !text-stone mb-5">{t.footer.sections.product}</h4>
             <ul className="space-y-3.5">
@@ -125,7 +107,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Resources */}
           <div data-footer-col>
             <h4 className="overline !text-stone mb-5">{t.footer.sections.resources}</h4>
             <ul className="space-y-3.5">
@@ -150,7 +131,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Legal */}
           <div data-footer-col>
             <h4 className="overline !text-stone mb-5">{t.footer.sections.legal}</h4>
             <ul className="space-y-3.5">

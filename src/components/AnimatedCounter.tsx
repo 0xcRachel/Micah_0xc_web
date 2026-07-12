@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import { gsap, prefersReducedMotion } from '../hooks/useGsap'
+import { gsap, ScrollTrigger, prefersReducedMotion } from '../hooks/useGsap'
 
 interface Props {
   value: string
@@ -12,13 +12,10 @@ export default function AnimatedCounter({ value, className }: Props) {
   const [display, setDisplay] = useState(value)
 
   useEffect(() => {
-    if (prefersReducedMotion() || animated.current) {
+    if (prefersReducedMotion() || animated.current || !ref.current) {
       setDisplay(value)
       return
     }
-
-    const el = ref.current
-    if (!el) return
 
     const numMatch = value.match(/^(\d+)/)
     if (!numMatch) {
@@ -26,25 +23,32 @@ export default function AnimatedCounter({ value, className }: Props) {
       return
     }
 
-    animated.current = true
     const target = parseInt(numMatch[1], 10)
     const suffix = value.slice(numMatch[1].length)
     const obj = { val: 0 }
 
-    gsap.to(obj, {
+    // Scrub-triggered counter — counts up as you scroll to it
+    const tween = gsap.to(obj, {
       val: target,
-      duration: 1.8,
-      ease: 'power2.out',
-      delay: 0.6,
+      duration: 1,
+      ease: 'none',
       onUpdate: () => {
         setDisplay(`${Math.round(obj.val)}${suffix}`)
+      },
+      scrollTrigger: {
+        trigger: ref.current,
+        start: 'top 90%',
+        end: 'top 50%',
+        scrub: 0.8,
+        onEnter: () => { animated.current = true },
       },
     })
 
     return () => {
+      tween.scrollTrigger?.kill()
       gsap.killTweensOf(obj)
     }
-  }, [])
+  }, [value])
 
   useEffect(() => {
     if (animated.current) setDisplay(value)

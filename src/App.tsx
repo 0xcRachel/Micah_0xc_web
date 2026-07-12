@@ -13,6 +13,8 @@ import Footer from './components/Footer'
 import SectionDivider from './components/SectionDivider'
 import ScrollToTop from './components/ScrollToTop'
 import AmbientParticles from './components/AmbientParticles'
+import AnimatedBackground from './components/AnimatedBackground'
+import SectionReveal from './components/SectionReveal'
 
 export default function App() {
   const mainRef = useRef<HTMLElement>(null)
@@ -20,20 +22,31 @@ export default function App() {
   return (
     <SmoothScroll>
       <LoadingScreen />
+      <AnimatedBackground />
       <CustomCursor />
-      <div className="noise-overlay" />
       <AmbientParticles />
       <Navbar />
       <main ref={mainRef} data-main-content>
         <Hero />
         <SectionDivider variant="warm" />
-        <Features />
-        <Architecture />
+        <SectionReveal>
+          <Features />
+        </SectionReveal>
         <SectionDivider variant="warm" />
-        <HowItWorks />
+        <SectionReveal>
+          <Architecture />
+        </SectionReveal>
         <SectionDivider variant="warm" />
-        <Download />
-        <Subscribe />
+        <SectionReveal>
+          <HowItWorks />
+        </SectionReveal>
+        <SectionDivider variant="warm" />
+        <SectionReveal>
+          <Download />
+        </SectionReveal>
+        <SectionReveal>
+          <Subscribe />
+        </SectionReveal>
       </main>
       <Footer />
       <ScrollToTop />

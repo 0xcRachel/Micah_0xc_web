@@ -23,25 +23,22 @@ export default function SectionHeading({
     () => {
       if (prefersReducedMotion() || !root.current) return
       const ctx = gsap.context(() => {
-        // Stagger reveal
-        gsap.fromTo(root.current!.children,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.1,
-            ease: 'power3.out',
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: root.current,
-              start: 'top 85%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
+        // Set initial hidden state FIRST
+        gsap.set(root.current!.children, { y: 30, opacity: 0, filter: 'blur(4px)' })
 
-        // Title color morph — from ink to terracotta on scroll
+        // Stagger reveal — scrub
+        gsap.to(root.current!.children, {
+          y: 0, opacity: 1, filter: 'blur(0px)',
+          duration: 1, stagger: 0.08, ease: 'none',
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'top 95%',
+            end: 'top 60%',
+            scrub: 0.8,
+          },
+        })
+
+        // Title color morph — scrub
         if (titleRef.current && variant === 'light') {
           gsap.fromTo(titleRef.current,
             { color: '#141413' },
@@ -49,7 +46,6 @@ export default function SectionHeading({
               color: '#c96442',
               duration: 1,
               ease: 'none',
-              immediateRender: false,
               scrollTrigger: {
                 trigger: root.current,
                 start: 'top 80%',

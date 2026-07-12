@@ -8,6 +8,7 @@ interface Props {
   delay?: number
   stagger?: number
   as?: 'line' | 'word'
+  blur?: boolean
 }
 
 export default function TextReveal({
@@ -17,6 +18,7 @@ export default function TextReveal({
   delay = 0,
   stagger = 0.04,
   as = 'word',
+  blur = true,
 }: Props) {
   const root = useRef<HTMLElement>(null)
 
@@ -25,30 +27,33 @@ export default function TextReveal({
       if (prefersReducedMotion() || !root.current) return
 
       const elements = root.current.querySelectorAll('[data-reveal-child]')
+      if (!elements.length) return
 
-      gsap.fromTo(
-        elements,
-        {
-          y: '110%',
-          opacity: 0,
-          rotateX: -40,
+      // Set initial hidden state FIRST
+      gsap.set(elements, {
+        y: '120%',
+        opacity: 0,
+        rotateX: -50,
+        filter: blur ? 'blur(6px)' : 'blur(0px)',
+      })
+
+      // Then create scrub animation
+      gsap.to(elements, {
+        y: '0%',
+        opacity: 1,
+        rotateX: 0,
+        filter: 'blur(0px)',
+        duration: 1,
+        stagger,
+        ease: 'none',
+        delay,
+        scrollTrigger: {
+          trigger: root.current,
+          start: 'top 95%',
+          end: 'top 50%',
+          scrub: 0.8,
         },
-        {
-          y: '0%',
-          opacity: 1,
-          rotateX: 0,
-          duration: 1,
-          stagger,
-          ease: 'power4.out',
-          delay,
-          immediateRender: false,
-          scrollTrigger: {
-            trigger: root.current,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-        },
-      )
+      })
     },
     { scope: root, dependencies: [] },
   )

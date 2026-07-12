@@ -1,7 +1,7 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { config } from '../config'
 import { useLanguage } from '../i18n/LanguageContext'
-import { gsap, useGSAP, prefersReducedMotion } from '../hooks/useGsap'
+import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '../hooks/useGsap'
 import { DownloadIcon, GithubIcon } from './icons'
 import AnimatedCounter from './AnimatedCounter'
 import MagneticButton from './MagneticButton'
@@ -18,49 +18,59 @@ export default function Hero() {
       const ctx = gsap.context(() => {
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
 
-        // Overline with blur-to-sharp
+        // ═══════════════════════════════════════════════════════════
+        // ENTRANCE ANIMATIONS — one-time on load
+        // ═══════════════════════════════════════════════════════════
+
+        // Overline: blur-to-sharp + slide
         tl.fromTo('[data-hero-overline]',
           { y: 40, opacity: 0, filter: 'blur(8px)' },
-          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, immediateRender: false },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0 },
         )
 
-        // Title words stagger with rotateX reveal
+        // Title words: rotateX reveal with blur
         const titleWords = root.current!.querySelectorAll('[data-hero-word]')
         if (titleWords.length) {
           tl.fromTo(titleWords,
-            { yPercent: 130, opacity: 0, rotateX: -60, filter: 'blur(6px)' },
-            { yPercent: 0, opacity: 1, rotateX: 0, filter: 'blur(0px)', duration: 1.4, stagger: 0.07, ease: 'power4.out', immediateRender: false },
+            { yPercent: 140, opacity: 0, rotateX: -60, filter: 'blur(8px)' },
+            {
+              yPercent: 0, opacity: 1, rotateX: 0, filter: 'blur(0px)',
+              duration: 1.4, stagger: 0.06, ease: 'power4.out',
+            },
             '-=0.5',
           )
         }
 
-        // Subtitle fade in with blur
+        // Subtitle
         tl.fromTo('[data-hero-sub]',
-          { y: 20, opacity: 0, filter: 'blur(4px)' },
-          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, immediateRender: false },
-          '-=0.6',
+          { y: 25, opacity: 0, filter: 'blur(4px)' },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.9 },
+          '-=0.7',
         )
 
-        // CTAs bounce in
+        // CTAs
         tl.fromTo('[data-hero-cta]',
-          { y: 30, opacity: 0, scale: 0.85 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.7, stagger: 0.12, ease: 'elastic.out(1, 0.5)', immediateRender: false },
-          '-=0.3',
+          { y: 30, opacity: 0, scale: 0.88 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.7, stagger: 0.12, ease: 'elastic.out(1, 0.5)' },
+          '-=0.4',
         )
 
-        // Stats count in with stagger
+        // Stats
         tl.fromTo('[data-hero-stat]',
-          { y: 30, opacity: 0, scale: 0.9 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, ease: 'back.out(1.4)', immediateRender: false },
+          { y: 30, opacity: 0, scale: 0.92 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, ease: 'back.out(1.4)' },
           '-=0.3',
         )
 
-        // Decorative blobs breathing with scale + rotation
-        const blobs = root.current!.querySelectorAll('[data-hero-parallax]')
-        blobs.forEach((blob, i) => {
+        // ═══════════════════════════════════════════════════════════
+        // CONTINUOUS ANIMATIONS — looping, GPU-friendly
+        // ═══════════════════════════════════════════════════════════
+
+        // Blobs breathing
+        root.current!.querySelectorAll('[data-hero-parallax]').forEach((blob, i) => {
           gsap.to(blob, {
-            scale: 1.15,
-            rotation: i % 2 === 0 ? 10 : -10,
+            scale: 1.12,
+            rotation: i % 2 === 0 ? 8 : -8,
             duration: 4 + i * 0.5,
             ease: 'sine.inOut',
             yoyo: true,
@@ -68,31 +78,24 @@ export default function Hero() {
           })
         })
 
-        // Terminal mockup float + glow
+        // Terminal mockup float
         const mockup = root.current!.querySelector('[data-hero-mockup]')
         if (mockup) {
           gsap.to(mockup, {
-            y: -15,
-            duration: 3.5,
-            ease: 'sine.inOut',
-            yoyo: true,
-            repeat: -1,
+            y: -14, duration: 3.5,
+            ease: 'sine.inOut', yoyo: true, repeat: -1,
           })
           gsap.to(mockup.querySelector('.terminal-glow'), {
-            opacity: 0.7,
-            duration: 2.5,
-            ease: 'sine.inOut',
-            yoyo: true,
-            repeat: -1,
+            opacity: 0.7, duration: 2.5,
+            ease: 'sine.inOut', yoyo: true, repeat: -1,
           })
         }
 
         // Floating geometric shapes
-        const shapes = root.current!.querySelectorAll('[data-hero-shape]')
-        shapes.forEach((shape, i) => {
+        root.current!.querySelectorAll('[data-hero-shape]').forEach((shape, i) => {
           gsap.to(shape, {
-            y: `${(i % 2 === 0 ? -1 : 1) * 20 + i * 5}`,
-            x: `${(i % 3 === 0 ? -1 : 1) * 10}`,
+            y: `${(i % 2 === 0 ? -1 : 1) * (15 + i * 5)}`,
+            x: `${(i % 3 === 0 ? -1 : 1) * 8}`,
             rotation: i % 2 === 0 ? 360 : -360,
             duration: 8 + i * 2,
             ease: 'none',
@@ -100,19 +103,13 @@ export default function Hero() {
           })
         })
 
-        // Parallax on scroll
+        // ═══════════════════════════════════════════════════════════
+        // SCROLL ANIMATIONS — tied to scroll position
+        // ═══════════════════════════════════════════════════════════
+
+        // Parallax blobs on scroll
         gsap.to('[data-hero-parallax]', {
-          yPercent: 25,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: root.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 1.5,
-          },
-        })
-        gsap.to('[data-hero-mockup]', {
-          yPercent: 15,
+          yPercent: 30,
           ease: 'none',
           scrollTrigger: {
             trigger: root.current,
@@ -122,16 +119,60 @@ export default function Hero() {
           },
         })
 
-        // Fade out hero on scroll
+        // Mockup parallax
+        if (mockup) {
+          gsap.to(mockup, {
+            yPercent: 18,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: root.current,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: 1.5,
+            },
+          })
+        }
+
+        // Content fade + move on scroll
         gsap.to('[data-hero-content]', {
-          y: -60,
-          opacity: 0,
+          y: -50, opacity: 0,
           ease: 'none',
           scrollTrigger: {
             trigger: root.current,
             start: '60% top',
             end: 'bottom top',
             scrub: 1,
+          },
+        })
+
+        // ═══ Title color morph — terracotta on scroll ═══
+        const terracottaWords = root.current!.querySelectorAll('[data-hero-word].text-terracotta')
+        terracottaWords.forEach((word) => {
+          gsap.fromTo(word,
+            { color: '#c96442' },
+            {
+              color: '#b85533',
+              textShadow: '0 0 20px rgba(201,100,66,0.3)',
+              ease: 'none',
+              scrollTrigger: {
+                trigger: root.current,
+                start: 'top top',
+                end: '50% top',
+                scrub: 0.5,
+              },
+            },
+          )
+        })
+
+        // ═══ Overline fade out on scroll ═══
+        gsap.to('[data-hero-overline]', {
+          opacity: 0, y: -20,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: root.current,
+            start: '20% top',
+            end: '40% top',
+            scrub: 0.5,
           },
         })
       }, root)
@@ -146,38 +187,14 @@ export default function Hero() {
 
   return (
     <section ref={root} id="top" className="relative overflow-hidden pt-32 pb-20 md:pt-44 md:pb-32 min-h-screen flex flex-col justify-center">
-      {/* Animated gradient mesh background */}
+      {/* ═══ Background blobs ═══ */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Primary blob */}
-        <div
-          data-hero-parallax
-          className="pointer-events-none absolute -top-28 -right-28 h-[500px] w-[500px] rounded-full opacity-20 blur-[60px] will-change-transform"
-          style={{ background: 'radial-gradient(circle, #d97757 0%, transparent 70%)' }}
-          aria-hidden
-        />
-        {/* Secondary blob */}
-        <div
-          data-hero-parallax
-          className="pointer-events-none absolute top-20 -left-36 h-[420px] w-[420px] rounded-full opacity-15 blur-[60px] will-change-transform"
-          style={{ background: 'radial-gradient(circle, #c2c0b6 0%, transparent 70%)' }}
-          aria-hidden
-        />
-        {/* Accent blob */}
-        <div
-          data-hero-parallax
-          className="pointer-events-none absolute bottom-0 right-1/4 h-[250px] w-[250px] rounded-full opacity-15 blur-[50px] will-change-transform"
-          style={{ background: 'radial-gradient(circle, #c96442 0%, transparent 70%)' }}
-          aria-hidden
-        />
-        {/* Deep accent blob */}
-        <div
-          data-hero-parallax
-          className="pointer-events-none absolute top-1/3 left-1/2 h-[180px] w-[180px] rounded-full opacity-10 blur-[40px] will-change-transform"
-          style={{ background: 'radial-gradient(circle, #e8a090 0%, transparent 70%)' }}
-          aria-hidden
-        />
+        <div data-hero-parallax className="pointer-events-none absolute -top-28 -right-28 h-[500px] w-[500px] rounded-full opacity-20 blur-[60px] will-change-transform" style={{ background: 'radial-gradient(circle, #d97757 0%, transparent 70%)' }} aria-hidden />
+        <div data-hero-parallax className="pointer-events-none absolute top-20 -left-36 h-[420px] w-[420px] rounded-full opacity-15 blur-[60px] will-change-transform" style={{ background: 'radial-gradient(circle, #c2c0b6 0%, transparent 70%)' }} aria-hidden />
+        <div data-hero-parallax className="pointer-events-none absolute bottom-0 right-1/4 h-[250px] w-[250px] rounded-full opacity-15 blur-[50px] will-change-transform" style={{ background: 'radial-gradient(circle, #c96442 0%, transparent 70%)' }} aria-hidden />
+        <div data-hero-parallax className="pointer-events-none absolute top-1/3 left-1/2 h-[180px] w-[180px] rounded-full opacity-10 blur-[40px] will-change-transform" style={{ background: 'radial-gradient(circle, #e8a090 0%, transparent 70%)' }} aria-hidden />
 
-        {/* Floating geometric shapes */}
+        {/* Floating shapes */}
         <div data-hero-shape className="pointer-events-none absolute top-32 right-1/4 w-3 h-3 border border-terracotta/30 rounded-sm will-change-transform" aria-hidden />
         <div data-hero-shape className="pointer-events-none absolute top-1/2 left-16 w-2 h-2 bg-terracotta/20 rounded-full will-change-transform" aria-hidden />
         <div data-hero-shape className="pointer-events-none absolute bottom-1/3 right-16 w-4 h-4 border border-stone/20 rotate-45 will-change-transform" aria-hidden />
@@ -185,25 +202,20 @@ export default function Hero() {
         <div data-hero-shape className="pointer-events-none absolute bottom-1/4 left-1/2 w-3 h-3 border border-terracotta/20 rounded-full will-change-transform" aria-hidden />
       </div>
 
-      {/* Floating terminal mockup */}
-      <div
-        data-hero-mockup
-        className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 z-5 pointer-events-none"
-        style={{ perspective: '800px' }}
-      >
+      {/* ═══ Terminal mockup ═══ */}
+      <div data-hero-mockup className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 z-5 pointer-events-none" style={{ perspective: '800px' }}>
         <TerminalMockup />
       </div>
 
-      {/* Marquee at top */}
+      {/* ═══ Marquees ═══ */}
       <div className="absolute top-24 left-0 right-0 pointer-events-none opacity-40">
         <MarqueeText text={t.hero.overline} className="text-[10px] tracking-[0.3em] uppercase font-sans text-stone" />
       </div>
-
-      {/* Second marquee below main content, opposite direction */}
       <div className="absolute bottom-24 left-0 right-0 pointer-events-none opacity-20">
         <MarqueeText text={t.hero.overline} direction="right" speed={0.6} className="text-[9px] tracking-[0.25em] uppercase font-sans text-stone" />
       </div>
 
+      {/* ═══ Content ═══ */}
       <div data-hero-content className="container-content relative z-10">
         <p data-hero-overline className="overline mb-6 !tracking-[0.2em]">
           {t.hero.overline}
@@ -222,11 +234,7 @@ export default function Hero() {
           <span className="block overflow-hidden mt-1">
             {titleWords2.map((word, i) => (
               <span key={i} className="inline-block overflow-hidden mr-[0.25em] align-bottom">
-                <span
-                  data-hero-word
-                  className={`inline-block ${i === titleWords2.length - 1 ? 'text-terracotta' : ''}`}
-                  style={{ transformOrigin: 'bottom center' }}
-                >
+                <span data-hero-word className={`inline-block ${i === titleWords2.length - 1 ? 'text-terracotta' : ''}`} style={{ transformOrigin: 'bottom center' }}>
                   {word}
                 </span>
               </span>
@@ -234,45 +242,28 @@ export default function Hero() {
           </span>
         </h1>
 
-        <p
-          data-hero-sub
-          className="mt-8 max-w-2xl text-[1.125rem] md:text-[1.25rem] leading-[1.7] text-olive font-sans"
-        >
+        <p data-hero-sub className="mt-8 max-w-2xl text-[1.125rem] md:text-[1.25rem] leading-[1.7] text-olive font-sans">
           {t.hero.subtitle}
         </p>
 
         <div data-hero-cta className="mt-12 flex flex-wrap items-center gap-4">
-          <MagneticButton
-            href={config.DOWNLOAD_URL}
-            className="btn-terracotta text-base"
-            strength={0.25}
-          >
+          <MagneticButton href={config.DOWNLOAD_URL} className="btn-terracotta text-base" strength={0.25}>
             <DownloadIcon />
             {t.hero.ctaPrimary}
             {config.DOWNLOAD_COMING_SOON && (
-              <span className="ml-1 text-[11px] font-normal opacity-80 bg-ink-deep/30 px-2 py-0.5 rounded">
-                {t.nav.comingSoon}
-              </span>
+              <span className="ml-1 text-[11px] font-normal opacity-80 bg-ink-deep/30 px-2 py-0.5 rounded">{t.nav.comingSoon}</span>
             )}
           </MagneticButton>
-          <MagneticButton
-            href={config.REPO_URL}
-            className="btn-sand text-base"
-            strength={0.25}
-          >
+          <MagneticButton href={config.REPO_URL} className="btn-sand text-base" strength={0.25}>
             <GithubIcon />
             {t.hero.ctaSecondary}
           </MagneticButton>
         </div>
 
-        {/* Stats row */}
+        {/* Stats */}
         <dl className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-2xl">
           {t.hero.stats.map((stat, i) => (
-            <div
-              key={i}
-              data-hero-stat
-              className="pl-5 group"
-            >
+            <div key={i} data-hero-stat className="pl-5 group">
               <dt className="font-serif text-3xl text-ink group-hover:text-terracotta transition-colors duration-300">
                 <AnimatedCounter value={stat.value} />
               </dt>
@@ -288,7 +279,6 @@ export default function Hero() {
         <div className="w-px h-8 bg-gradient-to-b from-stone to-transparent" />
       </div>
 
-      {/* Soft fade at the bottom */}
       <div className="pointer-events-none absolute bottom-0 inset-x-0 h-24 bg-gradient-to-b from-transparent to-parchment" />
     </section>
   )

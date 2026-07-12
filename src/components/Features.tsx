@@ -14,17 +14,10 @@ function FeatureCard({ item, index }: { item: { title: string; body: string }; i
     const card = tiltRef.current
     const glow = glowRef.current
     if (!card || !glow) return
-
     const rect = card.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
-
-    gsap.to(glow, {
-      x: x - 120,
-      y: y - 120,
-      duration: 0.5,
-      ease: 'power2.out',
-    })
+    gsap.to(glow, { x: x - 120, y: y - 120, duration: 0.5, ease: 'power2.out' })
   }
 
   return (
@@ -35,21 +28,15 @@ function FeatureCard({ item, index }: { item: { title: string; body: string }; i
       style={{ transformStyle: 'preserve-3d' }}
       onMouseMove={handleMouseMove}
     >
-      {/* Mouse-follow glow — larger, more premium */}
       <div
         ref={glowRef}
         className="pointer-events-none absolute top-0 left-0 w-64 h-64 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl"
         style={{ background: 'radial-gradient(circle, rgba(201,100,66,0.15) 0%, transparent 70%)' }}
       />
-
-      {/* Hover gradient overlay */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-terracotta/[0.05] via-transparent to-transparent" />
-
-      {/* Shimmer sweep on hover */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out" />
       </div>
-
       <div className="relative z-10">
         <div className="w-12 h-12 rounded-generous bg-sand flex items-center justify-center text-terracotta mb-6 transition-all duration-500 group-hover:bg-terracotta group-hover:text-ivory group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-terracotta/25">
           <Icon />
@@ -58,7 +45,6 @@ function FeatureCard({ item, index }: { item: { title: string; body: string }; i
           {item.title}
         </h3>
         <p className="mt-3 text-[0.95rem] leading-[1.7] text-olive">{item.body}</p>
-
         <div className="mt-5 h-px bg-gradient-to-r from-terracotta/0 via-terracotta/20 to-terracotta/0 group-hover:via-terracotta/50 transition-all duration-500" />
       </div>
     </article>
@@ -71,29 +57,45 @@ export default function Features() {
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) return
+      if (prefersReducedMotion() || !root.current) return
+
       const ctx = gsap.context(() => {
-        // Cards with dramatic entrance
-        gsap.fromTo('[data-feature-card]',
-          { y: 70, opacity: 0, rotateX: -12, scale: 0.92, filter: 'blur(6px)' },
-          {
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 1.0,
-            stagger: 0.15,
-            ease: 'power4.out',
-            immediateRender: false,
+        const cards = gsap.utils.toArray<HTMLElement>('[data-feature-card]')
+        if (!cards.length) return
+
+        // Set initial hidden state FIRST
+        gsap.set(cards, {
+          y: 80, opacity: 0, rotateX: -15, scale: 0.92, filter: 'blur(8px)',
+        })
+
+        // ═══ Card entrance — scrub ═══
+        gsap.to(cards, {
+          y: 0, opacity: 1, rotateX: 0, scale: 1, filter: 'blur(0px)',
+          duration: 1, stagger: 0.12, ease: 'none',
+          scrollTrigger: {
+            trigger: '[data-feature-grid]',
+            start: 'top 95%',
+            end: 'top 55%',
+            scrub: 0.8,
+          },
+        })
+
+        // ═══ Card parallax depth — different yPercent per card ═══
+        cards.forEach((card, i) => {
+          const depth = (i % 3 === 0) ? -8 : (i % 3 === 1) ? -12 : -6
+          gsap.to(card, {
+            yPercent: depth,
+            ease: 'none',
             scrollTrigger: {
               trigger: '[data-feature-grid]',
-              start: 'top 82%',
-              toggleActions: 'play none none none',
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1,
             },
-          },
-        )
+          })
+        })
       }, root)
+
       return () => ctx.revert()
     },
     { scope: root, dependencies: [] },

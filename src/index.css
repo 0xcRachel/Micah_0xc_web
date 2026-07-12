@@ -401,19 +401,6 @@ a, button, [data-cursor-hover], [data-hero-parallax], [data-arch-node] {
   will-change: transform;
 }
 
-/* Subtle noise texture overlay — very premium feel */
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9997;
-  pointer-events: none;
-  opacity: 0.15;
-  will-change: transform;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
-}
-
 /* Main content starts hidden, revealed by LoadingScreen */
 [data-main-content] {
   opacity: 0;
@@ -431,6 +418,11 @@ a, button, [data-cursor-hover], [data-hero-parallax], [data-arch-node] {
   animation: shimmer 2s linear infinite;
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gsap-reveal {
     opacity: 1 !important;
@@ -438,9 +430,6 @@ a, button, [data-cursor-hover], [data-hero-parallax], [data-arch-node] {
   }
   [data-main-content] {
     opacity: 1 !important;
-  }
-  .noise-overlay {
-    display: none;
   }
   html {
     scroll-behavior: auto;
