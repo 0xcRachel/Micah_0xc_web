@@ -21,14 +21,15 @@ export default function Subscribe() {
       if (prefersReducedMotion()) return
       const ctx = gsap.context(() => {
         gsap.fromTo('[data-sub-anim]',
-          { y: 40, opacity: 0, scale: 0.97 },
+          { y: 50, opacity: 0, scale: 0.94, filter: 'blur(6px)' },
           {
             y: 0,
             opacity: 1,
             scale: 1,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 1.0,
+            stagger: 0.18,
+            ease: 'power4.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: root.current,
@@ -47,15 +48,29 @@ export default function Subscribe() {
     e.preventDefault()
     if (!EMAIL_RE.test(email)) {
       setStatus('error')
+      // Shake animation on error
+      if (!prefersReducedMotion() && formRef.current) {
+        gsap.fromTo(formRef.current,
+          { x: -8 },
+          { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' },
+        )
+      }
       return
     }
     setStatus('success')
     if (!prefersReducedMotion() && successRef.current) {
-      gsap.fromTo(
-        successRef.current,
-        { opacity: 0, y: 10, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.4)' },
+      gsap.fromTo(successRef.current,
+        { opacity: 0, y: 15, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'elastic.out(1, 0.5)' },
       )
+      // Animate checkmark SVG
+      const check = successRef.current.querySelector('.check-path')
+      if (check) {
+        gsap.fromTo(check,
+          { strokeDashoffset: 24 },
+          { strokeDashoffset: 0, duration: 0.6, delay: 0.2, ease: 'power2.out' },
+        )
+      }
     }
     setEmail('')
 
@@ -95,7 +110,11 @@ export default function Subscribe() {
                   }}
                   placeholder={t.subscribe.placeholder}
                   aria-label="Email"
-                  className="w-full rounded-pill bg-white/70 backdrop-blur-sm border border-border-warm/80 px-5 py-3.5 text-[0.95rem] text-ink placeholder:text-stone/60 focus:border-terracotta/40 focus:ring-2 focus:ring-terracotta/10 focus:bg-white transition-all duration-300 outline-none shadow-sm"
+                  className={`w-full rounded-[9999px] bg-white/70 backdrop-blur-sm border px-5 py-3.5 text-[0.95rem] text-ink placeholder:text-stone/60 focus:outline-none transition-all duration-500 shadow-sm ${
+                    status === 'error'
+                      ? 'border-crimson/60 focus:border-crimson/80 focus:ring-2 focus:ring-crimson/15'
+                      : 'border-border-warm/80 focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/15 focus:shadow-[0_0_20px_rgba(201,100,66,0.1)]'
+                  }`}
                 />
               </div>
               <MagneticButton className="btn-terracotta shrink-0" strength={0.15}>
@@ -116,10 +135,10 @@ export default function Subscribe() {
             {status === 'success' && (
               <div
                 ref={successRef}
-                className="mt-4 flex items-center gap-3 bg-terracotta/5 rounded-pill px-5 py-3 mx-auto max-w-xs"
+                className="mt-4 flex items-center gap-3 bg-terracotta/5 rounded-[9999px] px-5 py-3 mx-auto max-w-xs"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 text-terracotta shrink-0">
-                  <path d="M20 6 9 17l-5-5" />
+                  <path className="check-path" d="M20 6 9 17l-5-5" style={{ strokeDasharray: 24, strokeDashoffset: 0 }} />
                 </svg>
                 <p className="text-[0.875rem] text-charcoal">{t.subscribe.success}</p>
               </div>

@@ -4,6 +4,11 @@ import { gsap, prefersReducedMotion } from '../hooks/useGsap'
 export default function LoadingScreen() {
   const containerRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLHeadingElement>(null)
+  const line1Ref = useRef<HTMLDivElement>(null)
+  const line2Ref = useRef<HTMLDivElement>(null)
+  const line3Ref = useRef<HTMLDivElement>(null)
+  const line4Ref = useRef<HTMLDivElement>(null)
+  const barRef = useRef<HTMLDivElement>(null)
   const [show, setShow] = useState(true)
 
   useEffect(() => {
@@ -17,38 +22,43 @@ export default function LoadingScreen() {
         onComplete: () => setShow(false),
       })
 
-      // Logo stamp — scale + elastic (no blur, GPU-friendly)
+      // Logo stamp — dramatic scale + rotate
       tl.fromTo(textRef.current,
-        { scale: 0.3, opacity: 0, rotate: -5 },
-        { scale: 1, opacity: 1, rotate: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)' },
+        { scale: 0.2, opacity: 0, rotate: -8, y: 20 },
+        { scale: 1, opacity: 1, rotate: 0, y: 0, duration: 1.0, ease: 'elastic.out(1, 0.4)' },
       )
 
-      // Tagline fade
-      tl.fromTo('[data-load-tag]',
-        { y: 12, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
-        '-=0.6',
-      )
+      // Typewriter lines — staggered reveal
+      const lines = [line1Ref.current, line2Ref.current, line3Ref.current, line4Ref.current]
+      lines.forEach((line, i) => {
+        if (!line) return
+        tl.fromTo(line,
+          { opacity: 0, x: -20 },
+          { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' },
+          `-=${0.3 - i * 0.05}`,
+        )
+      })
 
       // Progress bar
-      tl.fromTo('[data-load-bar]',
+      tl.fromTo(barRef.current,
         { scaleX: 0 },
-        { scaleX: 1, duration: 1.0, ease: 'power2.inOut' },
-        '-=0.3',
+        { scaleX: 1, duration: 0.8, ease: 'power2.inOut' },
+        '-=0.2',
       )
 
-      // Curtain slide up
+      // Curtain slide up with scale
       tl.to(containerRef.current, {
         yPercent: -100,
-        duration: 0.9,
+        scale: 1.05,
+        duration: 0.8,
         ease: 'power4.inOut',
-      }, '+=0.1')
+      }, '+=0.15')
 
       // Reveal main content
       gsap.to('[data-main-content]', {
         opacity: 1,
-        duration: 0.6,
-        delay: 0.3,
+        duration: 0.8,
+        delay: 0.2,
       })
     })
 
@@ -62,23 +72,41 @@ export default function LoadingScreen() {
       ref={containerRef}
       className="fixed inset-0 z-[100] bg-ink flex flex-col items-center justify-center"
     >
-      <div className="text-center">
+      {/* Animated background grid */}
+      <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(201,100,66,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(201,100,66,0.3) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+      <div className="text-center relative z-10">
         <h1
           ref={textRef}
-          className="font-serif text-4xl md:text-5xl text-ivory tracking-tight"
+          className="font-serif text-4xl md:text-6xl text-ivory tracking-tight"
         >
           <span className="text-terracotta">&lt;</span>
           Micah
           <span className="text-terracotta"> /&gt;</span>
         </h1>
-        <p data-load-tag className="mt-4 text-[11px] uppercase tracking-[0.3em] text-stone" style={{ opacity: 0 }}>
-          0xC · Protocol
-        </p>
+
+        {/* Typewriter lines */}
+        <div className="mt-6 font-mono text-[11px] text-stone/70 space-y-1">
+          <div ref={line1Ref} style={{ opacity: 0 }}>
+            <span className="text-terracotta">{'>'}</span> Initializing 0xC Protocol...
+          </div>
+          <div ref={line2Ref} style={{ opacity: 0 }}>
+            <span className="text-green-400">[OK]</span> Core engine loaded
+          </div>
+          <div ref={line3Ref} style={{ opacity: 0 }}>
+            <span className="text-green-400">[OK]</span> Security module active
+          </div>
+          <div ref={line4Ref} style={{ opacity: 0 }}>
+            <span className="text-terracotta">{'>'}</span> Ready
+          </div>
+        </div>
       </div>
-      <div className="mt-10 w-36 h-[2px] bg-ink-deep rounded-full overflow-hidden">
+
+      {/* Progress bar */}
+      <div className="mt-8 w-40 h-[2px] bg-ink-deep rounded-full overflow-hidden relative z-10">
         <div
-          data-load-bar
-          className="h-full bg-gradient-to-r from-terracotta to-terracotta/40 origin-left"
+          ref={barRef}
+          className="h-full bg-gradient-to-r from-terracotta via-terracotta/80 to-terracotta/40 origin-left"
           style={{ transform: 'scaleX(0)' }}
         />
       </div>

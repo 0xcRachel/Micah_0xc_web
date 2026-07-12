@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { config } from '../config'
 import { useLanguage } from '../i18n/LanguageContext'
-import { gsap, ScrollTrigger, useGSAP } from '../hooks/useGsap'
+import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '../hooks/useGsap'
 import { DownloadIcon } from './icons'
 import MagneticButton from './MagneticButton'
 
@@ -61,8 +61,8 @@ export default function Navbar() {
     gsap.to(indicator, {
       x: activeLink.offsetLeft,
       width: activeLink.offsetWidth,
-      duration: 0.5,
-      ease: 'elastic.out(1, 0.4)',
+      duration: 0.6,
+      ease: 'elastic.out(1, 0.35)',
     })
   }, [activeSection])
 
@@ -70,8 +70,8 @@ export default function Navbar() {
     () => {
       if (!navRef.current) return
       gsap.fromTo(navRef.current,
-        { y: -30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: 'power4.out', immediateRender: false },
+        { y: -30, opacity: 0, filter: 'blur(4px)' },
+        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power4.out', immediateRender: false },
       )
 
       if (progressRef.current) {
@@ -135,13 +135,17 @@ export default function Navbar() {
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      {/* Scroll progress bar */}
-      <div
-        ref={progressRef}
-        className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-terracotta to-terracotta/60 origin-left"
-        style={{ transform: 'scaleX(0)' }}
-        aria-hidden
-      />
+      {/* Scroll progress bar with glow */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-ink-deep/10">
+        <div
+          ref={progressRef}
+          className="h-full bg-gradient-to-r from-terracotta to-terracotta/60 origin-left relative"
+          style={{ transform: 'scaleX(0)' }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-terracotta to-terracotta/60 blur-[3px] opacity-60" />
+        </div>
+      </div>
+
       <nav className="container-content flex items-center justify-between h-16">
         {/* Brand */}
         <a
@@ -154,12 +158,14 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center" ref={linksRef}>
-          {/* Sliding indicator */}
+          {/* Sliding indicator with glow */}
           <div
             ref={indicatorRef}
             className="absolute h-8 rounded-cozy bg-terracotta/10 pointer-events-none transition-none"
             style={{ top: '50%', transform: 'translateY(-50%)' }}
-          />
+          >
+            <div className="absolute inset-0 rounded-cozy bg-terracotta/5 blur-[4px]" />
+          </div>
           <div className="flex items-center gap-1 relative">
             {NAV_LINKS.map((link) => {
               const isActive = activeSection === link.id

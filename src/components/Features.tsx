@@ -20,9 +20,9 @@ function FeatureCard({ item, index }: { item: { title: string; body: string }; i
     const y = e.clientY - rect.top
 
     gsap.to(glow, {
-      x: x - 100,
-      y: y - 100,
-      duration: 0.6,
+      x: x - 120,
+      y: y - 120,
+      duration: 0.5,
       ease: 'power2.out',
     })
   }
@@ -35,18 +35,23 @@ function FeatureCard({ item, index }: { item: { title: string; body: string }; i
       style={{ transformStyle: 'preserve-3d' }}
       onMouseMove={handleMouseMove}
     >
-      {/* Mouse-follow glow */}
+      {/* Mouse-follow glow — larger, more premium */}
       <div
         ref={glowRef}
-        className="pointer-events-none absolute top-0 left-0 w-52 h-52 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(201,100,66,0.12) 0%, transparent 70%)' }}
+        className="pointer-events-none absolute top-0 left-0 w-64 h-64 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl"
+        style={{ background: 'radial-gradient(circle, rgba(201,100,66,0.15) 0%, transparent 70%)' }}
       />
 
       {/* Hover gradient overlay */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-terracotta/[0.04] via-transparent to-transparent" />
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-terracotta/[0.05] via-transparent to-transparent" />
+
+      {/* Shimmer sweep on hover */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out" />
+      </div>
 
       <div className="relative z-10">
-        <div className="w-12 h-12 rounded-generous bg-sand flex items-center justify-center text-terracotta mb-6 transition-all duration-500 group-hover:bg-terracotta group-hover:text-ivory group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-terracotta/20">
+        <div className="w-12 h-12 rounded-generous bg-sand flex items-center justify-center text-terracotta mb-6 transition-all duration-500 group-hover:bg-terracotta group-hover:text-ivory group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-terracotta/25">
           <Icon />
         </div>
         <h3 className="font-serif text-[1.35rem] leading-[1.2] text-ink group-hover:text-terracotta transition-colors duration-300">
@@ -68,16 +73,18 @@ export default function Features() {
     () => {
       if (prefersReducedMotion()) return
       const ctx = gsap.context(() => {
+        // Cards with dramatic entrance
         gsap.fromTo('[data-feature-card]',
-          { y: 60, opacity: 0, rotateX: -8, scale: 0.95 },
+          { y: 70, opacity: 0, rotateX: -12, scale: 0.92, filter: 'blur(6px)' },
           {
             y: 0,
             opacity: 1,
             rotateX: 0,
             scale: 1,
-            duration: 0.8,
-            stagger: 0.12,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 1.0,
+            stagger: 0.15,
+            ease: 'power4.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: '[data-feature-grid]',

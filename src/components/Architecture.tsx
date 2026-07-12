@@ -23,18 +23,18 @@ export default function Architecture() {
           },
         })
 
-        // Nodes reveal with scale + blur
+        // Nodes reveal with dramatic blur-to-sharp + scale
         tl.fromTo(nodes,
-          { scale: 0.8, opacity: 0, filter: 'blur(8px)' },
-          { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.2, immediateRender: false },
+          { scale: 0.6, opacity: 0, filter: 'blur(12px)', y: 20 },
+          { scale: 1, opacity: 1, filter: 'blur(0px)', y: 0, duration: 1.0, stagger: 0.25, immediateRender: false },
         )
 
-        // Connectors draw in
+        // Connectors draw in with glow
         if (connectors.length) {
           tl.fromTo(
             connectors,
             { scaleX: 0, opacity: 0 },
-            { scaleX: 1, opacity: 1, duration: 0.6, stagger: 0.15, transformOrigin: 'left center', immediateRender: false },
+            { scaleX: 1, opacity: 1, duration: 0.8, stagger: 0.2, transformOrigin: 'left center', immediateRender: false },
             '-=0.8',
           )
         }
@@ -43,7 +43,7 @@ export default function Architecture() {
         const terracottaNode = nodes[0]
         if (terracottaNode) {
           gsap.to(terracottaNode, {
-            scale: 1.02,
+            scale: 1.03,
             duration: 2.5,
             ease: 'sine.inOut',
             yoyo: true,
@@ -68,42 +68,43 @@ export default function Architecture() {
         })
 
         connectors.forEach((line, i) => {
-          // 3 particles per connector at different offsets
-          for (let p = 0; p < 3; p++) {
+          // 4 particles per connector at different offsets
+          for (let p = 0; p < 4; p++) {
             const particle = document.createElement('div')
-            const size = 2 + Math.random() * 4
+            const size = 2 + Math.random() * 5
             particle.className = 'absolute rounded-full pointer-events-none'
             particle.style.cssText = `
               width:${size}px; height:${size}px;
-              background: radial-gradient(circle, rgba(201,100,66,0.8) 0%, rgba(201,100,66,0.2) 100%);
+              background: radial-gradient(circle, rgba(201,100,66,0.9) 0%, rgba(201,100,66,0.3) 100%);
               top: 0;
               left: 50%;
               transform: translateX(-50%);
               opacity: 0;
-              filter: blur(${Math.random() * 1}px);
+              filter: blur(${Math.random() * 0.5}px);
+              box-shadow: 0 0 ${size * 2}px rgba(201,100,66,0.4);
             `
             line.parentElement?.appendChild(particle)
 
-            const delay = i * 0.3 + p * 0.4
-            const speed = 0.6 + Math.random() * 0.6
+            const delay = i * 0.3 + p * 0.35
+            const speed = 0.5 + Math.random() * 0.5
 
             particleTl.fromTo(particle,
-              { top: '0%', opacity: 0, scale: 0.5 },
-              { top: '100%', opacity: 0.8, scale: 1, duration: speed, ease: 'power1.in', delay, immediateRender: false },
+              { top: '0%', opacity: 0, scale: 0.3 },
+              { top: '100%', opacity: 0.9, scale: 1, duration: speed, ease: 'power1.in', delay, immediateRender: false },
             )
-            particleTl.to(particle, { opacity: 0, duration: 0.15, ease: 'none' }, '>-0.05')
+            particleTl.to(particle, { opacity: 0, scale: 0.5, duration: 0.2, ease: 'none' }, '>-0.05')
           }
         })
 
-        // Principle tag
+        // Principle tag with bounce
         gsap.fromTo('[data-arch-principle]',
-          { opacity: 0, y: 20, scale: 0.95 },
+          { opacity: 0, y: 30, scale: 0.9 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.7,
-            ease: 'back.out(1.4)',
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.5)',
             immediateRender: false,
             scrollTrigger: {
               trigger: '[data-arch-principle]',
@@ -152,7 +153,7 @@ export default function Architecture() {
 
         <p
           data-arch-principle
-          className="mt-12 inline-flex items-center gap-3 text-[0.95rem] text-silver border border-ink-deep rounded-generous px-5 py-2.5 hover:border-terracotta/30 transition-colors duration-300"
+          className="mt-12 inline-flex items-center gap-3 text-[0.95rem] text-silver border border-ink-deep rounded-generous px-5 py-2.5 hover:border-terracotta/30 hover:shadow-[0_0_20px_rgba(201,100,66,0.15)] transition-all duration-500"
         >
           <span className="w-2 h-2 rounded-full bg-terracotta animate-pulse" />
           {t.architecture.principle}
@@ -173,18 +174,28 @@ function ArchNode({
 }) {
   const ring =
     accent === 'terracotta'
-      ? 'border-terracotta/40 hover:border-terracotta/60'
+      ? 'border-terracotta/40 hover:border-terracotta/70 hover:shadow-[0_0_30px_rgba(201,100,66,0.2)]'
       : accent === 'center'
-        ? 'border-silver/30 hover:border-silver/50'
-        : 'border-silver/20 hover:border-silver/40'
+        ? 'border-silver/30 hover:border-silver/60 hover:shadow-[0_0_25px_rgba(194,192,182,0.1)]'
+        : 'border-silver/20 hover:border-silver/50 hover:shadow-[0_0_20px_rgba(194,192,182,0.08)]'
+
+  const dot =
+    accent === 'terracotta'
+      ? 'bg-terracotta shadow-[0_0_8px_rgba(201,100,66,0.5)]'
+      : accent === 'center'
+        ? 'bg-silver shadow-[0_0_6px_rgba(194,192,182,0.3)]'
+        : 'bg-silver/60'
 
   return (
     <div
       data-arch-node
-      className={`bg-ink-deep border ${ring} rounded-very px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 transition-all duration-300 hover:shadow-lg hover:shadow-black/20`}
+      className={`bg-ink-deep border ${ring} rounded-very px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 transition-all duration-500 hover:translate-y-[-2px] group`}
     >
-      <span className="font-serif text-[1.15rem] text-ivory">{label}</span>
-      <span className="font-mono text-[0.8rem] text-silver">{detail}</span>
+      <div className="flex items-center gap-3">
+        <span className={`w-2 h-2 rounded-full ${dot} transition-shadow duration-300 group-hover:shadow-[0_0_12px_rgba(201,100,66,0.6)]`} />
+        <span className="font-serif text-[1.15rem] text-ivory">{label}</span>
+      </div>
+      <span className="font-mono text-[0.8rem] text-silver group-hover:text-terracotta/80 transition-colors duration-300">{detail}</span>
     </div>
   )
 }
@@ -194,8 +205,11 @@ function Connector() {
     <div className="flex justify-center" aria-hidden>
       <div
         data-arch-line
-        className="w-px h-10 bg-gradient-to-b from-terracotta/40 via-silver/30 to-silver/10"
-      />
+        className="w-px h-10 bg-gradient-to-b from-terracotta/40 via-silver/30 to-silver/10 relative"
+      >
+        {/* Glow on the connector */}
+        <div className="absolute inset-0 w-px bg-gradient-to-b from-terracotta/20 via-transparent to-transparent blur-[2px]" />
+      </div>
     </div>
   )
 }

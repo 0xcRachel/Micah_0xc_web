@@ -14,15 +14,16 @@ export default function Download() {
     () => {
       if (prefersReducedMotion()) return
       const ctx = gsap.context(() => {
-        // Container reveal
+        // Container reveal with dramatic scale + blur
         gsap.fromTo('[data-dl-container]',
-          { y: 40, opacity: 0, scale: 0.97 },
+          { y: 60, opacity: 0, scale: 0.92, filter: 'blur(8px)' },
           {
             y: 0,
             opacity: 1,
             scale: 1,
-            duration: 1,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 1.2,
+            ease: 'power4.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: root.current,
@@ -32,16 +33,17 @@ export default function Download() {
           },
         )
 
-        // Content stagger
+        // Content stagger with offset
         gsap.fromTo(root.current!.querySelectorAll('[data-dl-anim]'),
-          { y: 20, opacity: 0 },
+          { y: 30, opacity: 0, filter: 'blur(4px)' },
           {
             y: 0,
             opacity: 1,
-            duration: 0.6,
-            stagger: 0.08,
+            filter: 'blur(0px)',
+            duration: 0.7,
+            stagger: 0.1,
             ease: 'power3.out',
-            delay: 0.3,
+            delay: 0.4,
             immediateRender: false,
             scrollTrigger: {
               trigger: root.current,
@@ -51,17 +53,25 @@ export default function Download() {
           },
         )
 
-        // Glow breathing
+        // Glow breathing — multi-layer
         if (glowRef.current) {
           gsap.to(glowRef.current, {
-            scale: 1.15,
-            opacity: 0.35,
+            scale: 1.2,
+            opacity: 0.4,
             duration: 4,
             ease: 'sine.inOut',
             yoyo: true,
             repeat: -1,
           })
         }
+
+        // Grid pattern subtle animation
+        gsap.to('[data-dl-grid]', {
+          backgroundPosition: '40px 40px',
+          duration: 20,
+          ease: 'none',
+          repeat: -1,
+        })
       }, root)
       return () => ctx.revert()
     },
@@ -80,18 +90,30 @@ export default function Download() {
           {/* Multiple glow layers */}
           <div
             ref={glowRef}
-            className="pointer-events-none absolute -top-24 -right-12 h-80 w-80 rounded-full opacity-30 blur-[80px]"
+            className="pointer-events-none absolute -top-24 -right-12 h-96 w-96 rounded-full opacity-30 blur-[80px]"
             style={{ background: 'radial-gradient(circle, #c96442 0%, transparent 70%)' }}
             aria-hidden
           />
           <div
-            className="pointer-events-none absolute -bottom-20 -left-16 h-60 w-60 rounded-full opacity-20 blur-[60px]"
+            className="pointer-events-none absolute -bottom-20 -left-16 h-72 w-72 rounded-full opacity-20 blur-[60px]"
             style={{ background: 'radial-gradient(circle, #d97757 0%, transparent 70%)' }}
             aria-hidden
           />
+          <div
+            className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-48 w-48 rounded-full opacity-15 blur-[50px]"
+            style={{ background: 'radial-gradient(circle, #e8a090 0%, transparent 70%)' }}
+            aria-hidden
+          />
 
-          {/* Grid pattern */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          {/* Animated grid pattern */}
+          <div
+            data-dl-grid
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+              backgroundSize: '40px 40px',
+            }}
+          />
 
           <div className="relative max-w-2xl">
             <p data-dl-anim className="overline !text-silver mb-4 !tracking-[0.2em]">

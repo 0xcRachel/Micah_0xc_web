@@ -4,30 +4,31 @@ import { gsap, prefersReducedMotion } from '../hooks/useGsap'
 function createParticle(x: number, y: number, hue = 'c96442') {
   const el = document.createElement('div')
   el.className = 'pointer-events-none fixed top-0 left-0 z-[9998] rounded-full'
-  const size = 2 + Math.random() * 4
+  const size = 2 + Math.random() * 5
   el.style.cssText = `
     width:${size}px; height:${size}px;
     background:radial-gradient(circle, #${hue} 0%, transparent 100%);
     transform:translate(${x}px,${y}px);
-    opacity:0.8;
+    opacity:0.9;
     will-change:transform,opacity;
+    box-shadow: 0 0 ${size * 2}px rgba(201,100,66,0.4);
   `
   document.body.appendChild(el)
 
   gsap.to(el, {
-    x: x + (Math.random() - 0.5) * 60,
-    y: y + (Math.random() - 0.5) * 60,
+    x: x + (Math.random() - 0.5) * 80,
+    y: y + (Math.random() - 0.5) * 80,
     scale: 0,
     opacity: 0,
-    duration: 0.5 + Math.random() * 0.3,
-    ease: 'power2.out',
+    duration: 0.6 + Math.random() * 0.4,
+    ease: 'power3.out',
     onComplete: () => el.remove(),
   })
 }
 
-function burstParticles(x: number, y: number, count = 4) {
+function burstParticles(x: number, y: number, count = 6) {
   for (let i = 0; i < count; i++) {
-    setTimeout(() => createParticle(x, y), i * 40)
+    setTimeout(() => createParticle(x, y), i * 30)
   }
 }
 
@@ -36,7 +37,7 @@ export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null)
 
   const spawnBurst = useCallback((e: MouseEvent) => {
-    burstParticles(e.clientX, e.clientY, 6)
+    burstParticles(e.clientX, e.clientY, 8)
   }, [])
 
   useEffect(() => {
@@ -50,13 +51,13 @@ export default function CustomCursor() {
       gsap.to(cursor, {
         x: e.clientX,
         y: e.clientY,
-        duration: 0.5,
+        duration: 0.4,
         ease: 'power3.out',
       })
       gsap.to(dot, {
         x: e.clientX,
         y: e.clientY,
-        duration: 0.1,
+        duration: 0.08,
         ease: 'none',
       })
     }
@@ -69,15 +70,17 @@ export default function CustomCursor() {
       gsap.to(cursor, {
         x: cx,
         y: cy,
-        scale: 2.5,
-        opacity: 0.5,
-        duration: 0.3,
+        scale: 2.8,
+        opacity: 0.4,
+        borderColor: 'rgba(201,100,66,0.8)',
+        duration: 0.35,
+        ease: 'back.out(1.5)',
       })
       gsap.to(dot, { scale: 0, duration: 0.3 })
     }
 
     const onLeaveInteractive = () => {
-      gsap.to(cursor, { scale: 1, opacity: 1, duration: 0.3 })
+      gsap.to(cursor, { scale: 1, opacity: 1, borderColor: 'rgba(201,100,66,0.6)', duration: 0.35 })
       gsap.to(dot, { scale: 1, duration: 0.3 })
     }
 
@@ -106,12 +109,12 @@ export default function CustomCursor() {
     <>
       <div
         ref={cursorRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999] w-8 h-8 rounded-full border border-terracotta/60 -translate-x-1/2 -translate-y-1/2 mix-blend-difference hidden lg:block"
+        className="pointer-events-none fixed top-0 left-0 z-[9999] w-9 h-9 rounded-full border border-terracotta/60 -translate-x-1/2 -translate-y-1/2 mix-blend-difference hidden lg:block"
         aria-hidden
       />
       <div
         ref={dotRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999] w-1.5 h-1.5 rounded-full bg-terracotta -translate-x-1/2 -translate-y-1/2 hidden lg:block"
+        className="pointer-events-none fixed top-0 left-0 z-[9999] w-2 h-2 rounded-full bg-terracotta -translate-x-1/2 -translate-y-1/2 hidden lg:block"
         aria-hidden
       />
     </>

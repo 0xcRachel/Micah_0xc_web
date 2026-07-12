@@ -12,14 +12,16 @@ export default function Footer() {
     () => {
       if (prefersReducedMotion() || !root.current) return
       const ctx = gsap.context(() => {
+        // Column stagger with blur
         gsap.fromTo('[data-footer-col]',
-          { y: 30, opacity: 0 },
+          { y: 40, opacity: 0, filter: 'blur(4px)' },
           {
             y: 0,
             opacity: 1,
-            duration: 0.7,
-            stagger: 0.1,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            duration: 0.8,
+            stagger: 0.12,
+            ease: 'power4.out',
             immediateRender: false,
             scrollTrigger: {
               trigger: root.current,
@@ -29,12 +31,13 @@ export default function Footer() {
           },
         )
 
+        // Bottom bar reveal
         gsap.fromTo('[data-footer-bottom]',
           { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.6,
+            duration: 0.7,
             ease: 'power3.out',
             immediateRender: false,
             scrollTrigger: {
@@ -60,6 +63,7 @@ export default function Footer() {
 
   return (
     <footer ref={root} className="bg-ink text-ivory border-t border-ink-deep relative overflow-hidden">
+      {/* Subtle glow */}
       <div className="pointer-events-none absolute -top-32 left-1/4 h-64 w-64 rounded-full opacity-10 blur-[80px]" style={{ background: 'radial-gradient(circle, #c96442 0%, transparent 70%)' }} />
 
       <div className="container-content py-20 relative">
@@ -71,7 +75,7 @@ export default function Footer() {
               onClick={(e) => navClick(e, 'top')}
               className="font-serif text-xl font-medium text-ivory hover:text-terracotta transition-all duration-300 inline-block hover:scale-[1.02]"
               style={{ textShadow: '0 0 20px transparent' }}
-              onMouseEnter={(e) => { if (!prefersReducedMotion()) gsap.to(e.currentTarget, { textShadow: '0 0 20px rgba(201,100,66,0.3)', duration: 0.4 }) }}
+              onMouseEnter={(e) => { if (!prefersReducedMotion()) gsap.to(e.currentTarget, { textShadow: '0 0 25px rgba(201,100,66,0.4)', duration: 0.4 }) }}
               onMouseLeave={(e) => { if (!prefersReducedMotion()) gsap.to(e.currentTarget, { textShadow: '0 0 20px transparent', duration: 0.4 }) }}
             >
               {t.nav.brand}
@@ -89,10 +93,10 @@ export default function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative w-9 h-9 rounded-cozy bg-ink-deep flex items-center justify-center text-silver hover:text-terracotta transition-all duration-300 overflow-hidden group"
+                  className="relative w-9 h-9 rounded-cozy bg-ink-deep flex items-center justify-center text-silver hover:text-terracotta transition-all duration-300 overflow-hidden group hover:shadow-[0_0_15px_rgba(201,100,66,0.2)]"
                   onMouseEnter={(e) => {
                     if (prefersReducedMotion()) return
-                    gsap.to(e.currentTarget, { scale: 1.15, duration: 0.3, ease: 'back.out(1.5)' })
+                    gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3, ease: 'back.out(1.5)' })
                   }}
                   onMouseLeave={(e) => {
                     if (prefersReducedMotion()) return
