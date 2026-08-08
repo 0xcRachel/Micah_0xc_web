@@ -11,9 +11,12 @@ export const config = {
   /** GitHub repository link (footer + source). */
   REPO_URL: 'https://github.com/0xcRachel/Micah_0xC',
 
+  /** GitHub issues link (report an issue). */
+  ISSUE_URL: 'https://github.com/0xcRachel/Micah_0xC/issues',
+
   /** Show a "coming soon" badge on download buttons while DOWNLOAD_URL is '#'. */
   DOWNLOAD_COMING_SOON: false,
 
   /** Latest version label shown on download buttons. */
-  VERSION: '0.5.0',
+  VERSION: '0.6.0',
 } as const

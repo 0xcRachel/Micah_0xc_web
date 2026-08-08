@@ -13,6 +13,7 @@ export default function LoadingScreen() {
 
   useEffect(() => {
     if (prefersReducedMotion()) {
+      document.documentElement.classList.add('loaded')
       setShow(false)
       return
     }
@@ -46,16 +47,12 @@ export default function LoadingScreen() {
         '-=0.2',
       )
 
-      // Curtain slide up
+      // Curtain slide up → reveal main content
       tl.to(containerRef.current, {
         yPercent: -100, scale: 1.05,
         duration: 0.8, ease: 'power4.inOut',
       }, '+=0.15')
-
-      // Reveal main content
-      gsap.to('[data-main-content]', {
-        opacity: 1, duration: 0.8, delay: 0.2,
-      })
+        .call(() => document.documentElement.classList.add('loaded'))
     })
 
     return () => ctx.revert()
@@ -64,24 +61,24 @@ export default function LoadingScreen() {
   if (!show) return null
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[100] bg-ink flex flex-col items-center justify-center">
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(201,100,66,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(201,100,66,0.3) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+    <div ref={containerRef} className="fixed inset-0 z-[100] bg-cyber flex flex-col items-center justify-center">
+      <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,224,138,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0,224,138,0.3) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
       <div className="text-center relative z-10">
         <h1 ref={textRef} className="font-serif text-4xl md:text-6xl text-ivory tracking-tight">
-          <span className="text-terracotta">&lt;</span>Micah<span className="text-terracotta"> /&gt;</span>
+          <span className="text-led">&lt;</span>Micah<span className="text-led"> /&gt;</span>
         </h1>
 
-        <div className="mt-6 font-mono text-[11px] text-stone/70 space-y-1">
-          <div ref={line1Ref} style={{ opacity: 0 }}><span className="text-terracotta">{'>'}</span> Initializing 0xC Protocol...</div>
+        <div className="mt-6 font-mono text-[11px] text-silver/60 space-y-1">
+          <div ref={line1Ref} style={{ opacity: 0 }}><span className="text-led">{'>'}</span> Initializing 0xC Protocol...</div>
           <div ref={line2Ref} style={{ opacity: 0 }}><span className="text-green-400">[OK]</span> Core engine loaded</div>
           <div ref={line3Ref} style={{ opacity: 0 }}><span className="text-green-400">[OK]</span> Security module active</div>
-          <div ref={line4Ref} style={{ opacity: 0 }}><span className="text-terracotta">{'>'}</span> Ready</div>
+          <div ref={line4Ref} style={{ opacity: 0 }}><span className="text-led">{'>'}</span> Ready</div>
         </div>
       </div>
 
-      <div className="mt-8 w-40 h-[2px] bg-ink-deep rounded-full overflow-hidden relative z-10">
-        <div ref={barRef} className="h-full bg-gradient-to-r from-terracotta via-terracotta/80 to-terracotta/40 origin-left" style={{ transform: 'scaleX(0)' }} />
+      <div className="mt-8 w-40 h-[2px] bg-white/10 rounded-full overflow-hidden relative z-10">
+        <div ref={barRef} className="h-full bg-gradient-to-r from-led via-led/80 to-led/40 origin-left" style={{ transform: 'scaleX(0)' }} />
       </div>
     </div>
   )

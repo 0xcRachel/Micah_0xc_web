@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { useGSAP, gsap, prefersReducedMotion } from '../hooks/useGsap'
+import { gsap, useGsapMM } from '../hooks/useGsap'
 
 interface Props {
   text: string
@@ -8,7 +8,6 @@ interface Props {
   delay?: number
   stagger?: number
   as?: 'line' | 'word'
-  blur?: boolean
 }
 
 export default function TextReveal({
@@ -18,35 +17,25 @@ export default function TextReveal({
   delay = 0,
   stagger = 0.04,
   as = 'word',
-  blur = true,
 }: Props) {
   const root = useRef<HTMLElement>(null)
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || !root.current) return
+  useGsapMM((isMobile) => {
+    const elements = root.current?.querySelectorAll('[data-reveal-child]')
+    if (!elements?.length) return
 
-      const elements = root.current.querySelectorAll('[data-reveal-child]')
-      if (!elements.length) return
+    gsap.set(elements, { y: '120%', opacity: 0, rotateX: -50 })
 
-      // Set initial hidden state FIRST
-      gsap.set(elements, {
-        y: '120%',
-        opacity: 0,
-        rotateX: -50,
-        filter: blur ? 'blur(6px)' : 'blur(0px)',
-      })
-
-      // Then create scrub animation
+    if (isMobile) {
       gsap.to(elements, {
-        y: '0%',
-        opacity: 1,
-        rotateX: 0,
-        filter: 'blur(0px)',
-        duration: 1,
-        stagger,
-        ease: 'none',
-        delay,
+        y: '0%', opacity: 1, rotateX: 0, duration: 0.6, stagger, ease: 'power3.out',
+        delay, force3D: true,
+        scrollTrigger: { trigger: root.current, start: 'top 88%', once: true },
+      })
+    } else {
+      gsap.to(elements, {
+        y: '0%', opacity: 1, rotateX: 0, duration: 1, stagger, ease: 'none',
+        delay, force3D: true,
         scrollTrigger: {
           trigger: root.current,
           start: 'top 95%',
@@ -54,30 +43,10 @@ export default function TextReveal({
           scrub: 0.8,
         },
       })
-    },
-    { scope: root, dependencies: [] },
-  )
+    }
+  }, root)
 
   const Tag = tag
-
-  if (as === 'line') {
-    const words = text.split(' ')
-    return (
-      <Tag ref={root as any} className={className}>
-        {words.map((word, i) => (
-          <span key={i} className="inline-block overflow-hidden mr-[0.25em] align-bottom">
-            <span
-              data-reveal-child
-              className="inline-block"
-              style={{ transformOrigin: 'bottom center' }}
-            >
-              {word}
-            </span>
-          </span>
-        ))}
-      </Tag>
-    )
-  }
 
   return (
     <Tag ref={root as any} className={className}>

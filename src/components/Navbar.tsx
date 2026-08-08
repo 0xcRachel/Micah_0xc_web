@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { config } from '../config'
 import { useLanguage } from '../i18n/LanguageContext'
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '../hooks/useGsap'
+import { gsap, useGsapMM } from '../hooks/useGsap'
 import { DownloadIcon } from './icons'
 import MagneticButton from './MagneticButton'
 
 const NAV_LINKS = [
   { id: 'features', key: 'features' as const },
-  { id: 'architecture', key: 'architecture' as const },
-  { id: 'howItWorks', key: 'howItWorks' as const },
-  { id: 'license', key: 'license' as const },
+  { id: 'tech', key: 'tech' as const },
+  { id: 'security', key: 'security' as const },
+  { id: 'pricing', key: 'pricing' as const },
+  { id: 'faq', key: 'faq' as const },
 ]
 
 export default function Navbar() {
@@ -49,7 +50,7 @@ export default function Navbar() {
     return () => observer.disconnect()
   }, [])
 
-  // Animate sliding indicator
+  // Animate sliding indicator — transform only (x), width is set directly
   useEffect(() => {
     const indicator = indicatorRef.current
     const links = linksRef.current
@@ -58,26 +59,27 @@ export default function Navbar() {
     const activeLink = links.querySelector(`[data-nav-link="${activeSection}"]`) as HTMLElement | null
     if (!activeLink) return
 
+    indicator.style.width = `${activeLink.offsetWidth}px`
     gsap.to(indicator, {
       x: activeLink.offsetLeft,
-      width: activeLink.offsetWidth,
       duration: 0.6,
       ease: 'elastic.out(1, 0.35)',
+      force3D: true,
     })
   }, [activeSection])
 
-  useGSAP(
+  useGsapMM(
     () => {
-      if (!navRef.current) return
       gsap.fromTo(navRef.current,
-        { y: -30, opacity: 0, filter: 'blur(4px)' },
-        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power4.out', immediateRender: false },
+        { y: -28, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.9, ease: 'power4.out', immediateRender: false, force3D: true },
       )
 
       if (progressRef.current) {
         gsap.to(progressRef.current, {
           scaleX: 1,
           ease: 'none',
+          force3D: true,
           scrollTrigger: {
             trigger: document.documentElement,
             start: 'top top',
@@ -86,22 +88,8 @@ export default function Navbar() {
           },
         })
       }
-
-      // ═══ Navbar shadow on scroll ═══
-      if (navRef.current) {
-        gsap.to(navRef.current, {
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: document.documentElement,
-            start: '50px top',
-            end: '100px top',
-            scrub: 0.3,
-          },
-        })
-      }
     },
-    { scope: navRef, dependencies: [] },
+    navRef,
   )
 
   useEffect(() => {
@@ -109,28 +97,11 @@ export default function Navbar() {
     if (!drawer) return
 
     if (mobileOpen) {
-      gsap.set(drawer, { display: 'block', height: 0, opacity: 0 })
       const links = drawer.querySelectorAll('a, button')
-      gsap.to(drawer, {
-        height: 'auto',
-        opacity: 1,
-        duration: 0.4,
-        ease: 'power3.out',
-      })
       gsap.fromTo(links,
         { y: -12, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.35, stagger: 0.05, delay: 0.12, ease: 'power3.out', immediateRender: false },
+        { y: 0, opacity: 1, duration: 0.35, stagger: 0.05, delay: 0.12, ease: 'power3.out', immediateRender: false, force3D: true },
       )
-    } else {
-      gsap.to(drawer, {
-        height: 0,
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.in',
-        onComplete: () => {
-          gsap.set(drawer, { display: 'none' })
-        },
-      })
     }
   }, [mobileOpen])
 
@@ -145,18 +116,18 @@ export default function Navbar() {
       ref={navRef}
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-parchment/90 backdrop-blur-xl border-b border-border-cream/60 shadow-sm shadow-black/[0.02]'
+          ? 'bg-cyber/85 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/30'
           : 'bg-transparent border-b border-transparent'
       }`}
     >
       {/* Scroll progress bar with glow */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-ink-deep/10">
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/10">
         <div
           ref={progressRef}
-          className="h-full bg-gradient-to-r from-terracotta to-terracotta/60 origin-left relative"
+          className="h-full bg-gradient-to-r from-led to-led/60 origin-left relative"
           style={{ transform: 'scaleX(0)' }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-terracotta to-terracotta/60 blur-[3px] opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-led to-led/60 blur-[3px] opacity-60" />
         </div>
       </div>
 
@@ -165,7 +136,7 @@ export default function Navbar() {
         <a
           href="#top"
           onClick={(e) => handleNavClick(e, 'top')}
-          className="font-serif text-xl font-medium text-ink tracking-tight hover:text-terracotta transition-colors duration-300"
+          className="font-serif text-xl font-medium text-ivory tracking-tight hover:text-led transition-colors duration-300"
         >
           {t.nav.brand}
         </a>
@@ -175,10 +146,10 @@ export default function Navbar() {
           {/* Sliding indicator with glow */}
           <div
             ref={indicatorRef}
-            className="absolute h-8 rounded-cozy bg-terracotta/10 pointer-events-none transition-none"
+            className="absolute h-8 rounded-cozy bg-led/10 pointer-events-none"
             style={{ top: '50%', transform: 'translateY(-50%)' }}
           >
-            <div className="absolute inset-0 rounded-cozy bg-terracotta/5 blur-[4px]" />
+            <div className="absolute inset-0 rounded-cozy bg-led/5 blur-[4px]" />
           </div>
           <div className="flex items-center gap-1 relative">
             {NAV_LINKS.map((link) => {
@@ -191,8 +162,8 @@ export default function Navbar() {
                   onClick={(e) => handleNavClick(e, link.id)}
                   className={`relative px-4 py-2 text-[14px] rounded-cozy transition-all duration-300 ${
                     isActive
-                      ? 'text-terracotta'
-                      : 'text-olive hover:text-ink'
+                      ? 'text-led'
+                      : 'text-silver/80 hover:text-ivory'
                   }`}
                 >
                   {t.nav[link.key]}
@@ -206,17 +177,17 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <button
             onClick={toggle}
-            className="text-[13px] font-medium text-olive hover:text-ink px-3 py-2 rounded-cozy hover:bg-sand/60 transition-all duration-300"
+            className="text-[13px] font-medium text-silver/80 hover:text-ivory px-3 py-2 rounded-cozy hover:bg-white/10 transition-all duration-300"
             aria-label="Toggle language"
           >
-            <span className={`transition-opacity duration-300 ${lang === 'en' ? 'opacity-100 text-ink' : 'opacity-40'}`}>EN</span>
+            <span className={`transition-opacity duration-300 ${lang === 'en' ? 'opacity-100 text-ivory' : 'opacity-40'}`}>EN</span>
             <span className="mx-1 opacity-30">/</span>
-            <span className={`transition-opacity duration-300 ${lang === 'vi' ? 'opacity-100 text-ink' : 'opacity-40'}`}>VI</span>
+            <span className={`transition-opacity duration-300 ${lang === 'vi' ? 'opacity-100 text-ivory' : 'opacity-40'}`}>VI</span>
           </button>
 
           <MagneticButton
             href={config.DOWNLOAD_URL}
-            className="hidden sm:inline-flex btn-terracotta !px-4 !py-2 text-[14px] relative group"
+            className="hidden sm:inline-flex btn-led !px-4 !py-2 text-[14px] relative group"
             strength={0.15}
           >
             <DownloadIcon />
@@ -231,7 +202,7 @@ export default function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen((o) => !o)}
-            className="md:hidden p-2 text-ink"
+            className="md:hidden p-2 text-ivory min-w-12 min-h-12 flex items-center justify-center"
             aria-label="Toggle menu"
           >
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -252,35 +223,37 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — CSS grid-rows collapse (transform-free, interaction-driven) */}
       <div
         ref={drawerRef}
-        className="md:hidden bg-parchment/95 backdrop-blur-xl border-t border-border-cream/60 overflow-hidden"
-        style={{ display: 'none', height: 0, opacity: 0 }}
+        className="md:hidden bg-cyber/95 backdrop-blur-xl border-t border-white/10 overflow-hidden grid transition-[grid-template-rows] duration-500 ease-out"
+        style={{ gridTemplateRows: mobileOpen ? '1fr' : '0fr' }}
       >
-        <div className="container-content py-4 flex flex-col gap-1">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.id}
-              href={`#${link.id}`}
-              onClick={(e) => handleNavClick(e, link.id)}
-              className={`py-3 px-3 text-[15px] rounded-cozy transition-all duration-200 ${
-                activeSection === link.id
-                  ? 'text-terracotta bg-terracotta/5 font-medium'
-                  : 'text-olive hover:text-ink hover:bg-sand/40'
-              }`}
+        <div className="overflow-hidden">
+          <div className="container-content py-4 flex flex-col gap-1">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.id}
+                href={`#${link.id}`}
+                onClick={(e) => handleNavClick(e, link.id)}
+                className={`py-3 px-3 min-h-12 flex items-center text-[15px] rounded-cozy transition-all duration-200 ${
+                  activeSection === link.id
+                    ? 'text-led bg-led/5 font-medium'
+                    : 'text-silver/80 hover:text-ivory hover:bg-white/10'
+                }`}
+              >
+                {t.nav[link.key]}
+              </a>
+            ))}
+            <MagneticButton
+              href={config.DOWNLOAD_URL}
+              className="btn-led mt-3 w-full justify-center"
+              strength={0.1}
             >
-              {t.nav[link.key]}
-            </a>
-          ))}
-          <MagneticButton
-            href={config.DOWNLOAD_URL}
-            className="btn-terracotta mt-3 w-full justify-center"
-            strength={0.1}
-          >
-            <DownloadIcon />
-            {t.nav.download}
-          </MagneticButton>
+              <DownloadIcon />
+              {t.nav.download}
+            </MagneticButton>
+          </div>
         </div>
       </div>
     </header>

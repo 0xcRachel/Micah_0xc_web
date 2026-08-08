@@ -43,7 +43,7 @@ export default function SectionHeading({
           gsap.fromTo(titleRef.current,
             { color: '#141413' },
             {
-              color: '#c96442',
+              color: '#00e08a',
               duration: 1,
               ease: 'none',
               scrollTrigger: {

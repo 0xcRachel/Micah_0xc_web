@@ -88,14 +88,82 @@ export const ArrowUpRightIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 )
 
+export const SearchIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.35-4.35" />
+  </svg>
+)
+
+export const ActivityIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+  </svg>
+)
+
+export const StarIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z" />
+  </svg>
+)
+
+export const LayersIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+    <path d="m3 13 9 5 9-5" />
+    <path d="m3 17 9 5 9-5" />
+  </svg>
+)
+
+export const CodeIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <path d="m8 8-4 4 4 4" />
+    <path d="m16 8 4 4-4 4" />
+    <path d="m13 5-2 14" />
+  </svg>
+)
+
+export const RocketIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z" />
+    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z" />
+    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  </svg>
+)
+
+export const ChipIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <rect x="6" y="6" width="12" height="12" rx="2" />
+    <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" />
+  </svg>
+)
+
+export const ScreenshotIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" {...props}>
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M7 20h10M12 16v4M8 9h.01M16 9h.01M8 13h8" />
+  </svg>
+)
+
+export const CheckIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16" {...props}>
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+)
+
+export const ChevronDownIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" {...props}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+)
+
 /** Map feature index → icon component */
 export const featureIcons = [
-  BoltIcon,
-  ShieldIcon,
-  DiscordIcon,
-  RestoreIcon,
-  LockIcon,
-  ServerIcon,
+  SearchIcon,
+  ActivityIcon,
+  StarIcon,
+  LayersIcon,
+  CodeIcon,
+  RocketIcon,
 ]
-
-export const licenseIcons = [LockIcon, ShieldIcon, RefreshIcon]
