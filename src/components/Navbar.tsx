@@ -187,6 +187,7 @@ export default function Navbar() {
 
           <MagneticButton
             href={config.DOWNLOAD_URL}
+            download={config.DOWNLOAD_FILE}
             className="hidden sm:inline-flex btn-led !px-4 !py-2 text-[14px] relative group"
             strength={0.15}
           >
@@ -245,11 +246,12 @@ export default function Navbar() {
                 {t.nav[link.key]}
               </a>
             ))}
-            <MagneticButton
-              href={config.DOWNLOAD_URL}
-              className="btn-led mt-3 w-full justify-center"
-              strength={0.1}
-            >
+          <MagneticButton
+            href={config.DOWNLOAD_URL}
+            download={config.DOWNLOAD_FILE}
+            className="btn-led mt-3 w-full justify-center"
+            strength={0.1}
+          >
               <DownloadIcon />
               {t.nav.download}
             </MagneticButton>

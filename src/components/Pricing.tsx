@@ -96,7 +96,7 @@ export default function Pricing() {
                     {plan.cta}
                   </MagneticButton>
                 ) : (
-                  <MagneticButton href={config.DOWNLOAD_URL} className="btn-sand w-full justify-center" strength={0.15}>
+                  <MagneticButton href={config.DOWNLOAD_URL} download={config.DOWNLOAD_FILE} className="btn-sand w-full justify-center" strength={0.15}>
                     <DownloadIcon width={16} height={16} />
                     {plan.cta}
                   </MagneticButton>

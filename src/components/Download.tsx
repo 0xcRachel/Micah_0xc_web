@@ -85,7 +85,7 @@ export default function Download() {
             </p>
 
             <div data-dl-anim className="mt-10 flex flex-wrap items-center gap-4">
-              <MagneticButton href={config.DOWNLOAD_URL} className="btn-led text-base !px-7 !py-3.5" strength={0.2}>
+              <MagneticButton href={config.DOWNLOAD_URL} download={config.DOWNLOAD_FILE} className="btn-led text-base !px-7 !py-3.5" strength={0.2}>
                 <DownloadIcon />
                 {t.download.cta}
                 <span className="ml-1 text-[12px] opacity-80 font-normal">· {t.download.size}</span>

@@ -135,7 +135,7 @@ export default function Hero() {
         </p>
 
         <div data-hero-cta className="mt-12 flex flex-wrap items-center gap-4">
-          <MagneticButton href={config.DOWNLOAD_URL} className="btn-led text-base" strength={0.25}>
+          <MagneticButton href={config.DOWNLOAD_URL} download={config.DOWNLOAD_FILE} className="btn-led text-base" strength={0.25}>
             <DownloadIcon />
             {t.hero.ctaPrimary}
             {config.DOWNLOAD_COMING_SOON && (

@@ -2,8 +2,11 @@
  * Site configuration — edit these placeholders to wire up real links.
  */
 export const config = {
-  /** Primary download URL for the Micah .exe. Set to GitHub Releases when published. */
-  DOWNLOAD_URL: 'https://drive.google.com/file/d/1xi-HYraCxgz6FuPT9UgmYeErdVxSHgmP/view?usp=sharing',
+  /** Primary download URL for the Micah .exe — bundled with the site (Vercel static). */
+  DOWNLOAD_URL: '/downloads/Micah_0xC_0.6.0_x64_en-US.msi',
+
+  /** Filename used for the browser `download` attribute. */
+  DOWNLOAD_FILE: 'Micah_0xC_0.6.0_x64_en-US.msi',
 
   /** Discord invite URL for the "Join Discord" CTA. */
   DISCORD_URL: '#',

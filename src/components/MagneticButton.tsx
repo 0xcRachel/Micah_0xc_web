@@ -6,10 +6,11 @@ interface Props {
   className?: string
   strength?: number
   href?: string
+  download?: string
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void
 }
 
-export default function MagneticButton({ children, className = '', strength = 0.3, href, onClick }: Props) {
+export default function MagneticButton({ children, className = '', strength = 0.3, href, download, onClick }: Props) {
   const ref = useRef<HTMLAnchorElement | HTMLButtonElement>(null)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -46,6 +47,7 @@ export default function MagneticButton({ children, className = '', strength = 0.
       <a
         ref={ref as RefObject<HTMLAnchorElement>}
         href={href}
+        download={download}
         className={className}
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
