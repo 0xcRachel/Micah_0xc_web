@@ -1,128 +1,99 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
+import { config } from '../config'
 import { useLanguage } from '../i18n/LanguageContext'
-import { useGsapMM, gsap, markWC, clearWC } from '../hooks/useGsap'
+import { gsap } from '../hooks/useGsap'
 import TextReveal from './TextReveal'
+import Reveal from './Reveal'
 import MagneticButton from './MagneticButton'
+import { FeatherDivider } from './motion-art'
 
 type Status = 'idle' | 'success' | 'error'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+/**
+ * Subscribe v1.0.0 — form email + thẻ Discord, reveal once.
+ */
 export default function Subscribe() {
   const { t } = useLanguage()
-  const root = useRef<HTMLElement>(null)
-  const formRef = useRef<HTMLFormElement>(null)
-  const successRef = useRef<HTMLDivElement>(null)
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<Status>('idle')
-
-  useGsapMM((isMobile) => {
-    const anims = markWC('[data-sub-anim]', root.current!)
-    if (!anims.length) return
-
-    if (isMobile) {
-      gsap.set(anims, { y: 30, opacity: 0, scale: 0.96 })
-      gsap.to(anims, {
-        y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out', force3D: true,
-        scrollTrigger: { trigger: root.current, start: 'top 85%', once: true },
-        onComplete: () => clearWC(anims),
-      })
-    } else {
-      gsap.set(anims, { y: 50, opacity: 0, scale: 0.94 })
-      gsap.to(anims, {
-        y: 0, opacity: 1, scale: 1, duration: 1, stagger: 0.12, ease: 'none', force3D: true,
-        scrollTrigger: {
-          trigger: root.current,
-          start: 'top 95%',
-          end: 'top 60%',
-          scrub: 0.8,
-          onLeave: () => clearWC(anims),
-          onEnterBack: () => anims.forEach((el) => { el.style.willChange = 'transform, opacity' }),
-        },
-      })
-    }
-  }, root)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!EMAIL_RE.test(email)) {
       setStatus('error')
-      if (formRef.current) {
-        gsap.fromTo(formRef.current, { x: -8 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)', force3D: true })
-      }
+      gsap.fromTo('#subscribe-form', { x: -8 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)', force3D: true })
       return
     }
     setStatus('success')
-    if (successRef.current) {
-      gsap.fromTo(successRef.current,
-        { opacity: 0, y: 15, scale: 0.9 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'elastic.out(1, 0.5)', force3D: true },
-      )
-      const check = successRef.current.querySelector('.check-path')
-      if (check) {
-        gsap.fromTo(check,
-          { strokeDashoffset: 24 },
-          { strokeDashoffset: 0, duration: 0.6, delay: 0.2, ease: 'power2.out' },
-        )
-      }
-    }
     setEmail('')
-    setTimeout(() => setStatus('idle'), 4000)
+    gsap.fromTo(
+      '#subscribe-success',
+      { opacity: 0, y: 12, scale: 0.95 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.5)', force3D: true },
+    )
+    setTimeout(() => setStatus('idle'), 4500)
   }
 
   return (
-    <section ref={root} id="subscribe" className="section-y relative">
+    <section id="subscribe" className="section-y relative scroll-mt-20">
       <div className="container-content">
         <div className="max-w-xl mx-auto text-center">
-          <div data-sub-anim>
-            <TextReveal
-              text={t.subscribe.title}
-              tag="h2"
-              className="font-serif text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] leading-[1.2] text-ivory"
-              stagger={0.03}
-            />
-            <p className="mt-4 text-[1rem] md:text-[1.125rem] leading-[1.7] text-silver/80">
+          <Reveal>
+            <p className="overline mb-4 text-remi-soft/90">{t.subscribe.overline}</p>
+          </Reveal>
+          <TextReveal
+            text={t.subscribe.title}
+            tag="h2"
+            className="font-serif text-[1.8rem] sm:text-[2.1rem] md:text-[2.5rem] leading-[1.2] text-pearl"
+            stagger={0.03}
+          />
+          <Reveal delay={0.1}>
+            <p className="mt-4 text-[1rem] md:text-[1.08rem] leading-[1.7] text-mist">
               {t.subscribe.subtitle}
             </p>
+          </Reveal>
 
-            <form ref={formRef} onSubmit={handleSubmit} className="mt-10 flex flex-col sm:flex-row gap-3 justify-center" noValidate>
-              <div className="relative w-full sm:w-[280px]">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (status !== 'idle') setStatus('idle') }}
-                  placeholder={t.subscribe.placeholder}
-                  aria-label="Email"
-                  className={`w-full min-h-12 rounded-[9999px] bg-white/[0.06] backdrop-blur-sm border px-5 py-3.5 text-[0.95rem] text-ivory placeholder:text-silver/50 focus:outline-none transition-all duration-500 ${
-                    status === 'error'
-                      ? 'border-crimson/60 focus:border-crimson/80 focus:ring-2 focus:ring-crimson/15'
-                      : 'border-white/10 focus:border-led/50 focus:ring-2 focus:ring-led/15 focus:shadow-[0_0_20px_rgba(0,224,138,0.1)]'
-                  }`}
-                />
-              </div>
+          <Reveal delay={0.15}>
+            <form id="subscribe-form" onSubmit={handleSubmit} className="mt-9 flex flex-col sm:flex-row gap-3 justify-center" noValidate>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); if (status !== 'idle') setStatus('idle') }}
+                placeholder={t.subscribe.placeholder}
+                aria-label="Email"
+                className={`w-full sm:w-[280px] min-h-12 rounded-[9999px] bg-white/[0.05] border px-5 py-3.5 text-[0.95rem] text-pearl placeholder:text-mist/50 focus:outline-none transition-colors duration-300 ${
+                  status === 'error'
+                    ? 'border-crimson/60'
+                    : 'border-white/12 focus:border-remi/60'
+                }`}
+              />
               <MagneticButton className="btn-led shrink-0 min-h-12" strength={0.15}>
                 {t.subscribe.button}
               </MagneticButton>
             </form>
 
             {status === 'error' && (
-              <p className="mt-3 text-[0.85rem] text-crimson flex items-center gap-2 justify-center">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 shrink-0">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="m15 9-6 6" />
-                  <path d="m9 9 6 6" />
-                </svg>
-                {t.subscribe.error}
-              </p>
+              <p className="mt-3 text-[0.85rem] text-crimson">{t.subscribe.error}</p>
             )}
             {status === 'success' && (
-              <div ref={successRef} className="mt-4 flex items-center gap-3 bg-led/5 border border-led/20 rounded-[9999px] px-5 py-3 mx-auto max-w-xs">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 text-led shrink-0">
-                  <path className="check-path" d="M20 6 9 17l-5-5" style={{ strokeDasharray: 24, strokeDashoffset: 0 }} />
-                </svg>
-                <p className="text-[0.875rem] text-silver">{t.subscribe.success}</p>
+              <div id="subscribe-success" className="mt-4 inline-flex items-center gap-2.5 bg-remi/10 border border-remi/25 rounded-[9999px] px-5 py-2.5">
+                <span className="text-remi-soft">✓</span>
+                <p className="text-[0.875rem] text-mist">{t.subscribe.success}</p>
               </div>
             )}
-          </div>
+          </Reveal>
+
+          <Reveal delay={0.2}>
+            <FeatherDivider className="my-9 max-w-xs mx-auto" />
+            <div className="rounded-very border border-white/10 bg-white/[0.03] p-6 text-center hover:border-remi/30 transition-colors duration-500">
+              <h3 className="font-serif text-[1.2rem] text-pearl">{t.subscribe.discordTitle}</h3>
+              <p className="mt-2 text-[0.9rem] text-mist/90">{t.subscribe.discordBody}</p>
+              <MagneticButton href={config.DISCORD_URL} className="btn-discord mt-5" strength={0.15}>
+                {t.subscribe.discordCta}
+              </MagneticButton>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>

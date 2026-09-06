@@ -26,14 +26,14 @@ export const translations = {
       ctaSecondary: 'View on GitHub',
       versionLabel: 'Latest version',
       stats: [
-        { value: '0.6.0', label: 'latest version' },
+        { value: '1.0.0', label: 'latest version' },
         { value: '100%', label: 'local-first processing' },
         { value: '6', label: 'core features' },
       ],
     },
     socialProof: {
       title: 'Trusted by gamers who want control',
-      items: ['Open source', 'v0.6.0', 'Windows', 'Tauri + React', 'Free forever'],
+      items: ['Open source', 'v1.0.0', 'Windows', 'Tauri + React', 'Free forever'],
     },
     features: {
       overline: 'What it does',
@@ -85,7 +85,7 @@ export const translations = {
         },
         {
           title: 'Dark mode',
-          caption: 'Switch themes seamlessly with a consistent LED-green accent.',
+          caption: 'Switch themes seamlessly with a consistent pink accent.',
         },
       ],
     },
@@ -97,9 +97,9 @@ export const translations = {
         { label: 'Platform', value: 'Windows', detail: 'Native desktop app for Windows 10+.' },
         { label: 'Frontend', value: 'React 19 + Rsbuild', detail: 'Fast builds and a smooth GSAP-powered interface.' },
         { label: 'Backend', value: 'Tauri 2 (Rust)', detail: 'Lightweight, secure, and RAM-efficient — a fraction of Electron’s footprint.' },
-        { label: 'Theme', value: 'Dark & Light', detail: 'Consistent LED-green accent across both modes.' },
+        { label: 'Theme', value: 'Dark & Light', detail: 'Consistent pink accent across both modes.' },
         { label: 'Packaging', value: 'MSI + NSIS', detail: 'Professional installers for Windows.' },
-        { label: 'Version', value: '0.6.0', detail: 'Current release, actively maintained.' },
+        { label: 'Version', value: '1.0.0', detail: 'Current release, actively maintained.' },
       ],
     },
     security: {
@@ -217,14 +217,14 @@ export const translations = {
       ctaSecondary: 'Xem trên GitHub',
       versionLabel: 'Phiên bản mới nhất',
       stats: [
-        { value: '0.6.0', label: 'phiên bản hiện tại' },
+        { value: '1.0.0', label: 'phiên bản hiện tại' },
         { value: '100%', label: 'xử lý local-first' },
         { value: '6', label: 'tính năng chính' },
       ],
     },
     socialProof: {
       title: 'Được tin dùng bởi những gamer muốn kiểm soát',
-      items: ['Mã nguồn mở', 'v0.6.0', 'Windows', 'Tauri + React', 'Miễn phí mãi mãi'],
+      items: ['Mã nguồn mở', 'v1.0.0', 'Windows', 'Tauri + React', 'Miễn phí mãi mãi'],
     },
     features: {
       overline: 'Ứng dụng làm gì',
@@ -276,7 +276,7 @@ export const translations = {
         },
         {
           title: 'Dark mode',
-          caption: 'Chuyển theme liền mạch với accent LED green nhất quán.',
+          caption: 'Chuyển theme liền mạch với accent hồng nhất quán.',
         },
       ],
     },
@@ -288,9 +288,9 @@ export const translations = {
         { label: 'Nền tảng', value: 'Windows', detail: 'Ứng dụng desktop chạy native trên Windows 10+.' },
         { label: 'Frontend', value: 'React 19 + Rsbuild', detail: 'Build nhanh và giao diện mượt mà nhờ GSAP.' },
         { label: 'Backend', value: 'Tauri 2 (Rust)', detail: 'Nhẹ, nhanh, bảo mật cao — RAM thấp hơn hẳn Electron.' },
-        { label: 'Theme', value: 'Dark & Light', detail: 'Accent LED green nhất quán ở cả hai chế độ.' },
+        { label: 'Theme', value: 'Dark & Light', detail: 'Accent hồng nhất quán ở cả hai chế độ.' },
         { label: 'Đóng gói', value: 'MSI + NSIS', detail: 'Bộ cài đặt chuyên nghiệp cho Windows.' },
-        { label: 'Phiên bản', value: '0.6.0', detail: 'Bản phát hành hiện tại, đang được bảo trì.' },
+        { label: 'Phiên bản', value: '1.0.0', detail: 'Bản phát hành hiện tại, đang được bảo trì.' },
       ],
     },
     security: {

@@ -1,97 +1,70 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
-import { useGsapMM, gsap, markWC, clearWC } from '../hooks/useGsap'
-import TextReveal from './TextReveal'
-import { ChevronDownIcon } from './icons'
+import SectionHeading from './SectionHeading'
+import Reveal from './Reveal'
+
+/**
+ * FAQ v1.0.0 — accordion grid-rows (không animate height gây lag),
+ * một mục mở tại một thời điểm.
+ */
+function FaqItem({ q, a, open, onToggle, index }: { q: string; a: string; open: boolean; onToggle: () => void; index: number }) {
+  return (
+    <div
+      className={`rounded-generous border overflow-hidden transition-colors duration-300 ${
+        open ? 'border-remi/35 bg-remi/[0.05]' : 'border-white/10 bg-white/[0.02] hover:border-white/20'
+      }`}
+    >
+      <button
+        onClick={onToggle}
+        aria-expanded={open}
+        className="w-full flex items-center gap-4 text-left px-5 md:px-6 py-4 md:py-5 min-h-[56px]"
+      >
+        <span className={`font-mono text-[11px] shrink-0 ${open ? 'text-remi-soft' : 'text-mist/50'}`}>
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <span className={`flex-1 font-serif text-[1.02rem] md:text-[1.08rem] ${open ? 'text-pearl' : 'text-pearl/90'}`}>{q}</span>
+        <span
+          className={`shrink-0 w-8 h-8 rounded-full border flex items-center justify-center text-[16px] leading-none transition-transform duration-500 will-change-transform ${
+            open ? 'rotate-45 border-remi/50 text-remi-soft bg-remi/10' : 'border-white/15 text-mist'
+          }`}
+        >
+          +
+        </span>
+      </button>
+      <div
+        className="grid transition-[grid-template-rows] duration-500 ease-out"
+        style={{ gridTemplateRows: open ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          <p className="px-5 md:px-6 pb-5 pl-[52px] md:pl-[56px] text-[0.92rem] leading-[1.7] text-mist">{a}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function FAQ() {
   const { t } = useLanguage()
-  const root = useRef<HTMLElement>(null)
-  const [open, setOpen] = useState<number | null>(0)
-
-  useGsapMM((isMobile) => {
-    const items = gsap.utils.toArray<HTMLElement>('[data-faq-item]')
-    if (!items.length) return
-    const wc = markWC(items)
-
-    if (isMobile) {
-      gsap.set(items, { y: 24, opacity: 0 })
-      gsap.to(items, {
-        y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: 'power3.out', force3D: true,
-        scrollTrigger: { trigger: '[data-faq-list]', start: 'top 85%', once: true },
-        onComplete: () => clearWC(wc),
-      })
-    } else {
-      gsap.set(items, { y: 40, opacity: 0 })
-      gsap.to(items, {
-        y: 0, opacity: 1, duration: 0.9, stagger: 0.08, ease: 'none', force3D: true,
-        scrollTrigger: {
-          trigger: '[data-faq-list]',
-          start: 'top 94%',
-          end: 'top 55%',
-          scrub: 0.8,
-          onLeave: () => clearWC(wc),
-          onEnterBack: () => items.forEach((el) => { el.style.willChange = 'transform, opacity' }),
-        },
-      })
-    }
-  }, root)
+  const [open, setOpen] = useState(0)
 
   return (
-    <section ref={root} id="faq" className="section-y relative">
-      <div className="container-content">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-14 items-start">
-          <div className="lg:sticky lg:top-28">
-            <TextReveal
-              text={t.faq.title}
-              tag="h2"
-              className="font-serif text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] leading-[1.2] text-ivory"
-              stagger={0.03}
-            />
-            <p className="mt-4 text-[1rem] md:text-[1.125rem] leading-[1.7] text-silver/80 max-w-md">
-              {t.faq.subtitle}
-            </p>
-          </div>
-
-          <div data-faq-list className="space-y-3">
-            {t.faq.items.map((item, i) => {
-              const isOpen = open === i
-              return (
-                <div
-                  key={i}
-                  data-faq-item
-                  className={`rounded-very border transition-all duration-500 overflow-hidden backdrop-blur-sm ${
-                    isOpen
-                      ? 'border-led/40 bg-white/[0.05] shadow-[0_0_30px_rgba(0,224,138,0.08)]'
-                      : 'border-white/10 bg-white/[0.03] hover:border-white/20'
-                  }`}
-                >
-                  <button
-                    onClick={() => setOpen(isOpen ? null : i)}
-                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="font-serif text-[1.05rem] leading-[1.3] text-ivory">{item.q}</span>
-                    <span
-                      className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
-                        isOpen ? 'bg-led text-ink rotate-180' : 'bg-white/[0.06] text-silver/60'
-                      }`}
-                    >
-                      <ChevronDownIcon width={16} height={16} />
-                    </span>
-                  </button>
-                  <div
-                    className="grid transition-[grid-template-rows] duration-500 ease-out"
-                    style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="px-6 pb-5 text-[0.95rem] leading-[1.7] text-silver/70">{item.a}</p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+    <section id="faq" className="section-y relative scroll-mt-20">
+      <div className="container-content grid lg:grid-cols-[0.8fr_1.2fr] gap-10 items-start">
+        <div className="lg:sticky lg:top-28">
+          <SectionHeading overline={t.faq.overline} title={t.faq.title} subtitle={t.faq.subtitle} />
+        </div>
+        <div className="space-y-3">
+          {t.faq.items.map((item, i) => (
+            <Reveal key={`${item.q}-${i}`} delay={Math.min(i * 0.04, 0.16)}>
+              <FaqItem
+                q={item.q}
+                a={item.a}
+                index={i}
+                open={open === i}
+                onToggle={() => setOpen(open === i ? -1 : i)}
+              />
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { useRef, useState, type MouseEvent, type ReactNode, type RefObject } from 'react'
+import { useEffect, useRef, type MouseEvent, type ReactNode, type RefObject } from 'react'
 import { gsap, prefersReducedMotion } from '../hooks/useGsap'
 
 interface Props {
@@ -8,39 +8,46 @@ interface Props {
   href?: string
   download?: string
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void
+  'aria-label'?: string
 }
 
-export default function MagneticButton({ children, className = '', strength = 0.3, href, download, onClick }: Props) {
+/**
+ * MagneticButton v1.0.0 — dùng quickTo (không tạo tween mỗi mousemove → hết lag).
+ * Chỉ active trên fine pointer + desktop.
+ */
+export default function MagneticButton({ children, className = '', strength = 0.25, href, download, onClick, ...rest }: Props) {
   const ref = useRef<HTMLAnchorElement | HTMLButtonElement>(null)
-  const [isHovered, setIsHovered] = useState(false)
+  const movers = useRef<{ x: (v: number) => void; y: (v: number) => void } | null>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el || prefersReducedMotion()) return
+    if (window.matchMedia('(pointer: coarse)').matches) return
+    movers.current = {
+      x: gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3.out' }),
+      y: gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3.out' }),
+    }
+  }, [])
 
   const handleMouseMove = (e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
-    if (prefersReducedMotion()) return
+    const m = movers.current
     const el = ref.current
-    if (!el) return
+    if (!m || !el) return
     const rect = el.getBoundingClientRect()
-    const x = e.clientX - rect.left - rect.width / 2
-    const y = e.clientY - rect.top - rect.height / 2
-    gsap.to(el, {
-      x: x * strength,
-      y: y * strength,
-      duration: 0.4,
-      ease: 'power3.out',
-    })
+    m.x((e.clientX - rect.left - rect.width / 2) * strength)
+    m.y((e.clientY - rect.top - rect.height / 2) * strength)
   }
-
-  const handleMouseEnter = () => setIsHovered(true)
 
   const handleMouseLeave = () => {
-    setIsHovered(false)
-    if (prefersReducedMotion()) return
-    gsap.to(ref.current, {
-      x: 0,
-      y: 0,
-      duration: 0.7,
-      ease: 'elastic.out(1, 0.3)',
-    })
+    const m = movers.current
+    const el = ref.current
+    if (!m || !el) return
+    m.x(0)
+    m.y(0)
+    gsap.fromTo(el, { scale: 1 }, { scale: 1, duration: 0.01 })
   }
+
+  const inner = <span className="relative z-10 flex items-center gap-2.5">{children}</span>
 
   if (href) {
     return (
@@ -50,16 +57,10 @@ export default function MagneticButton({ children, className = '', strength = 0.
         download={download}
         className={className}
         onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        {...rest}
       >
-        <span className="relative z-10 flex items-center gap-2.5">{children}</span>
-        {isHovered && (
-          <span
-            className="absolute inset-0 rounded-[inherit] opacity-30 blur-xl transition-opacity duration-500 pointer-events-none"
-            style={{ background: 'radial-gradient(circle at center, currentColor 0%, transparent 70%)' }}
-          />
-        )}
+        {inner}
       </a>
     )
   }
@@ -71,16 +72,10 @@ export default function MagneticButton({ children, className = '', strength = 0.
       type="button"
       onClick={onClick}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      {...rest}
     >
-      <span className="relative z-10 flex items-center gap-2.5">{children}</span>
-      {isHovered && (
-        <span
-          className="absolute inset-0 rounded-[inherit] opacity-30 blur-xl transition-opacity duration-500 pointer-events-none"
-          style={{ background: 'radial-gradient(circle at center, currentColor 0%, transparent 70%)' }}
-        />
-      )}
+      {inner}
     </button>
   )
 }

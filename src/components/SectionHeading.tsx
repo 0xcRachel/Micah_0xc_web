@@ -1,90 +1,45 @@
-import { useGSAP, gsap, prefersReducedMotion } from '../hooks/useGsap'
 import { useRef } from 'react'
+import { useGsapMM, gsap, markWC, clearWC } from '../hooks/useGsap'
 
 interface Props {
   overline: string
   title: string
   subtitle?: string
   align?: 'left' | 'center'
-  variant?: 'light' | 'dark'
 }
 
-export default function SectionHeading({
-  overline,
-  title,
-  subtitle,
-  align = 'left',
-  variant = 'light',
-}: Props) {
+/**
+ * SectionHeading v1.0.0 — chống lag:
+ *  - Chỉ y + opacity, trigger once (không scrub, không blur filter)
+ */
+export default function SectionHeading({ overline, title, subtitle, align = 'left' }: Props) {
   const root = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || !root.current) return
-      const ctx = gsap.context(() => {
-        // Set initial hidden state FIRST
-        gsap.set(root.current!.children, { y: 30, opacity: 0, filter: 'blur(4px)' })
-
-        // Stagger reveal — scrub
-        gsap.to(root.current!.children, {
-          y: 0, opacity: 1, filter: 'blur(0px)',
-          duration: 1, stagger: 0.08, ease: 'none',
-          scrollTrigger: {
-            trigger: root.current,
-            start: 'top 95%',
-            end: 'top 60%',
-            scrub: 0.8,
-          },
-        })
-
-        // Title color morph — scrub
-        if (titleRef.current && variant === 'light') {
-          gsap.fromTo(titleRef.current,
-            { color: '#141413' },
-            {
-              color: '#00e08a',
-              duration: 1,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: root.current,
-                start: 'top 80%',
-                end: 'top 40%',
-                scrub: 0.5,
-              },
-            },
-          )
-        }
-      }, root)
-      return () => ctx.revert()
-    },
-    { scope: root, dependencies: [variant] },
-  )
-
-  const isDark = variant === 'dark'
+  useGsapMM((isMobile) => {
+    const el = root.current
+    if (!el) return
+    const kids = markWC(el.children)
+    gsap.set(el.children, { y: isMobile ? 20 : 28, opacity: 0, force3D: true })
+    gsap.to(el.children, {
+      y: 0,
+      opacity: 1,
+      duration: isMobile ? 0.6 : 0.85,
+      stagger: 0.09,
+      ease: 'power3.out',
+      force3D: true,
+      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      onComplete: () => clearWC(kids),
+    })
+  }, root)
 
   return (
-    <div
-      ref={root}
-      className={`max-w-2xl ${align === 'center' ? 'mx-auto text-center' : ''}`}
-    >
-      <p className={`overline mb-4 ${isDark ? '!text-silver' : ''}`}>{overline}</p>
-      <h2
-        ref={titleRef}
-        className={`font-serif text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] leading-[1.2] ${
-          isDark ? 'text-ivory' : 'text-ink'
-        }`}
-      >
+    <div ref={root} className={`max-w-2xl ${align === 'center' ? 'mx-auto text-center' : ''}`}>
+      <p className="overline mb-4 text-remi-soft/90">{overline}</p>
+      <h2 className="font-serif text-[1.8rem] sm:text-[2.1rem] md:text-[2.6rem] leading-[1.18] text-pearl">
         {title}
       </h2>
       {subtitle && (
-        <p
-          className={`mt-4 text-[1rem] md:text-[1.125rem] leading-[1.6] ${
-            isDark ? 'text-silver' : 'text-olive'
-          }`}
-        >
-          {subtitle}
-        </p>
+        <p className="mt-4 text-[1rem] md:text-[1.1rem] leading-[1.65] text-mist">{subtitle}</p>
       )}
     </div>
   )

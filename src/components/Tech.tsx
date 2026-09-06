@@ -1,82 +1,47 @@
-import { useRef } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
-import { useGsapMM, gsap, markWC, clearWC } from '../hooks/useGsap'
-import TextReveal from './TextReveal'
-import { ChipIcon } from './icons'
+import SectionHeading from './SectionHeading'
+import Reveal from './Reveal'
+import { TimeDial } from './motion-art'
 
+/**
+ * Tech v1.0.0 — bảng stack + dial thời gian trang trí.
+ */
 export default function Tech() {
   const { t } = useLanguage()
-  const root = useRef<HTMLElement>(null)
-
-  useGsapMM((isMobile) => {
-    const cards = gsap.utils.toArray<HTMLElement>('[data-tech-card]')
-    if (!cards.length) return
-    const wc = markWC(cards)
-
-    if (isMobile) {
-      gsap.set(cards, { y: 30, opacity: 0 })
-      gsap.to(cards, {
-        y: 0, opacity: 1, duration: 0.55, stagger: 0.06, ease: 'power3.out', force3D: true,
-        scrollTrigger: { trigger: '[data-tech-grid]', start: 'top 85%', once: true },
-        onComplete: () => clearWC(wc),
-      })
-    } else {
-      gsap.set(cards, { y: 50, opacity: 0, scale: 0.94 })
-      gsap.to(cards, {
-        y: 0, opacity: 1, scale: 1,
-        duration: 1, stagger: 0.1, ease: 'none', force3D: true,
-        scrollTrigger: {
-          trigger: '[data-tech-grid]',
-          start: 'top 90%',
-          end: 'top 60%',
-          scrub: 0.8,
-          onLeave: () => clearWC(wc),
-          onEnterBack: () => cards.forEach((c) => { c.style.willChange = 'transform, opacity' }),
-        },
-      })
-    }
-  }, root)
 
   return (
-    <section ref={root} id="tech" className="section-dark section-y relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-      <div className="pointer-events-none absolute -top-32 right-1/4 h-80 w-80 rounded-full opacity-15 blur-[90px]" style={{ background: 'radial-gradient(circle, #00e08a 0%, transparent 70%)' }} aria-hidden />
-
-      <div className="container-content relative">
-        <div className="flex items-end justify-between gap-6 flex-wrap">
-          <div>
-            <TextReveal
-              text={t.tech.title}
-              tag="h2"
-              className="font-serif text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] leading-[1.2] text-ivory max-w-2xl"
-              stagger={0.03}
-            />
-            <p className="mt-4 text-[1rem] md:text-[1.125rem] leading-[1.7] text-silver max-w-2xl">
-              {t.tech.subtitle}
-            </p>
-          </div>
-          <span className="hidden lg:inline-flex items-center gap-2.5 text-silver border border-ink-deep rounded-generous px-5 py-2.5 mb-1">
-            <ChipIcon className="text-led" width={18} height={18} />
-            <span className="font-mono text-[0.8rem]">v{`${t.tech.items[5].value}`}</span>
-          </span>
+    <section id="tech" className="section-y relative scroll-mt-20">
+      <div className="container-content grid lg:grid-cols-[0.9fr_1.1fr] gap-12 items-start">
+        <div className="lg:sticky lg:top-28">
+          <SectionHeading overline={t.tech.overline} title={t.tech.title} subtitle={t.tech.subtitle} />
+          <Reveal delay={0.15} className="mt-8 hidden lg:block">
+            <div className="relative w-56 h-56">
+              <div className="prism-halo absolute inset-0 rounded-full opacity-40" />
+              <TimeDial className="relative w-full h-full text-remi/50" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="font-serif text-3xl text-pearl">v1.0.0</p>
+                  <p className="font-mono text-[10px] tracking-[0.25em] text-mist/70 mt-1">STABLE</p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
 
-        <div data-tech-grid className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" style={{ perspective: '1200px' }}>
+        <div className="space-y-3">
           {t.tech.items.map((item, i) => (
-            <div
-              key={i}
-              data-tech-card
-              className="group relative rounded-very border border-ink-deep bg-ink-deep/40 p-6 transition-all duration-500 hover:border-led/40 hover:shadow-[0_0_30px_rgba(0,224,138,0.12)] hover:-translate-y-1"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-[0.2em] text-silver/60">{item.label}</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-led/40 group-hover:bg-led group-hover:shadow-[0_0_10px_rgba(0,224,138,0.8)] transition-all duration-500" />
+            <Reveal key={i} delay={Math.min(i * 0.05, 0.2)} from={i % 2 === 0 ? 'right' : 'up'}>
+              <div className="card !p-5 flex gap-5 items-start group">
+                <span className="font-mono text-[11px] text-remi-soft/70 pt-1 shrink-0 w-8">0{i + 1}</span>
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-baseline gap-x-3">
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-mist/70">{item.label}</span>
+                    <span className="font-serif text-[1.15rem] text-pearl group-hover:text-gradient">{item.value}</span>
+                  </div>
+                  <p className="mt-1.5 text-[0.9rem] text-mist/90 leading-relaxed">{item.detail}</p>
+                </div>
               </div>
-              <div className="mt-3 font-serif text-[1.35rem] leading-[1.2] text-ivory group-hover:text-led transition-colors duration-300">
-                {item.value}
-              </div>
-              <p className="mt-2 text-[0.875rem] leading-[1.6] text-silver">{item.detail}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

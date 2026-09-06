@@ -3,10 +3,10 @@
  */
 export const config = {
   /** Primary download URL for the Micah .exe — bundled with the site (Vercel static). */
-  DOWNLOAD_URL: '/downloads/Micah_0xC_0.7.0_x64_en-US.msi',
+  DOWNLOAD_URL: '/downloads/Micah_0xC_1.0.0_x64_en-US.msi',
 
   /** Filename used for the browser `download` attribute. */
-  DOWNLOAD_FILE: 'Micah_0xC_0.7.0_x64_en-US.msi',
+  DOWNLOAD_FILE: 'Micah_0xC_1.0.0_x64_en-US.msi',
 
   /** Discord invite URL for the "Join Discord" CTA. */
   DISCORD_URL: '#',
@@ -21,5 +21,5 @@ export const config = {
   DOWNLOAD_COMING_SOON: false,
 
   /** Latest version label shown on download buttons. */
-  VERSION: '0.7.0',
+  VERSION: '1.0.0',
 } as const
